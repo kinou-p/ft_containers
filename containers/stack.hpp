@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:30 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/19 17:22:33 by apommier         ###   ########.fr       */
+/*   Updated: 2022/10/21 13:43:05 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,9 @@ class stack
 {	
 	public:
 
+		//-----------------------------
 		//---------MEMBER TYPE---------
+		//-----------------------------
 		typedef std::size_t		size_type;
 		typedef T				value_type;
 		typedef Container		container_type;
@@ -32,7 +34,10 @@ class stack
 		container_type	c;
 		
 	public:
+	
+		//---------------------------------------
 		//---------COPLIEN FORM FUNCTION---------
+		//---------------------------------------
 		explicit stack (const container_type& ctnr = container_type()) : c(ctnr){}//default constructor
 		stack<T, Container>(const stack &other )//copy constructor
 		{
@@ -45,7 +50,10 @@ class stack
 				this->c = other.c;
 			return *this;
 		}
+		
+		//----------------------------------
 		//---------MEMBER FUNCTION----------
+		//----------------------------------
 		bool empty() const
 		{
 			return (c.empty());
@@ -75,6 +83,47 @@ class stack
 		{
 			return (c.pop_back());
 		}
+		
+		//---------------------------------------------
+		//---------OPERATOR OVERLOAD FUNCTION----------
+		//---------------------------------------------
+		
+		// template <class T, class Container>
+		// bool operator== (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		// {
+
+		// }
+		
+		// template <class T, class Container>
+		// bool operator!= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		// {
+
+		// }
+		
+		// template <class T, class Container>
+		// bool operator<  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		// {
+
+		// }
+		
+		// template <class T, class Container>
+		// bool operator<= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		// {
+
+		// }
+		
+		// template <class T, class Container>
+		// bool operator>  (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		// {
+
+		// }
+		
+		// template <class T, class Container>
+		// bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
+		// {
+
+		// }
+		
 };
 
 }

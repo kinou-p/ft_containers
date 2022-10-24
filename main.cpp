@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:35 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/12 19:46:56 by apommier         ###   ########.fr       */
+/*   Updated: 2022/10/19 18:35:21 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 	{
 		const int idx = rand() % COUNT;
 		vector_buffer[idx].idx = 5;
-	}
+	} 
 	ft::vector<Buffer>().swap(vector_buffer);
 
 	try
