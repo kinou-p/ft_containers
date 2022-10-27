@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/23 19:58:10 by apommier         ###   ########.fr       */
+/*   Updated: 2022/10/26 19:39:20 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,19 @@ class vector
 		_tab = 0
 		_size = 0
 		_capacity = 0
+		_start = 0;
+		_end = 0;
+		_end_capacity = 0;
 	}
 	
 	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _allocator(alloc) //fill constructor
 	{
-		_tab = 
-		_size = 
-		_capacity = 
+		_tab = 0
+		_size = 0
+		_capacity = 0
+		_start = 0;
+		_end = 0;
+		_end_capacity = 0;
 	}
 	
 	template <class InputIterator>
@@ -61,7 +67,7 @@ class vector
 	
 	vector (const vector& x)//copy constructor
 	{
-
+		
 	}
 	
 	~vector()
@@ -81,13 +87,32 @@ class vector
 		//-------------------------
 		//--------Iterators--------
 		//-------------------------
+		iterator begin()
+		{
+			return (_start);
+		}
+		
+		iterator end()
+		{
+			return (_begin);
+		}
+		
+		reverse_iterator rbegin()
+		{
+			return (_end);
+		}
+		
+		reverse_iterator rend()
+		{
+			return (_start);
+		}
 		
 		//------------------------
 		//--------Capacity--------
 		//------------------------
 		size_type size() const
 		{
-			return (_size);
+			return (_end - _start);
 		}
 		
 		size_type max_size() const
@@ -97,17 +122,28 @@ class vector
 		
 		void resize (size_type n, value_type val = value_type()) //Resizes the container so that it contains n elements.
 		{
-
+			if (n > this->max_size())
+				throw (std::length_error("vector::resize"));
+			else if (n < this->size())
+			{
+				while (n > this->size())
+				{
+					_end--;
+					_allocator.destroy(_end);
+				}
+			}
+			//else // n > size
+				//insert()
 		}
 		
 		size_type capacity() const
 		{
-			return (_capacity);
+			return (_end_capacity - _start);
 		}
 		
 		bool empty() const
 		{
-			if (!_size)
+			if (!_end - _start)
 				return (1);
 			return(0);
 		}
@@ -144,32 +180,32 @@ class vector
 		
 		reference front()
 		{
-
+			return (*_start);
 		}
 		
 		const_reference front() const
 		{
-
+			return (*_start);
 		}
 		
 		reference back()
 		{
-
+			return (*_end);
 		}
 		
 		const_reference back() const
 		{
-
+			return (*_end);
 		}
 		
 		value_type* data()
 		{
-
+			return (_tab);
 		}
 		
 		const value_type* data() const
 		{
-
+			return (_tab);
 		}
 		
 		//-------------------------
@@ -193,7 +229,8 @@ class vector
 		
 		void pop_back()
 		{
-
+			_allocator.destroy(_end - 1);
+			_end--;
 		}
 		
 		iterator insert (iterator position, const value_type& val) //single element
@@ -280,8 +317,12 @@ class vector
 		
 		value_type		*_tab;
 		size_type		_size;
-		size_type		_capacity;
+		//size_type		_capacity;
+		
 		allocator_type	_allocator;
+		pointer			_end;
+		pointer			_start;
+		pointer			_end_capacity;
 };
 	
 }
