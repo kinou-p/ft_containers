@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/26 19:39:20 by apommier         ###   ########.fr       */
+/*   Updated: 2022/10/28 17:58:43 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@ class vector
 	typedef Allocator 								allocator_type;
 	typedef value_type& 							reference;
 	typedef const value_type&						const_reference;
-	typedef typename Allocator::pointer						pointer;
-	typedef typename Allocator::const_pointer				const_pointer;
-	typedef value_type								iterator;
-	typedef value_type								const_iterator;
+	typedef typename Allocator::pointer				pointer;
+	typedef typename Allocator::const_pointer		const_pointer;
+	typedef value_type*	iterator;
+	typedef value_type*	const_iterator;
 	typedef std::reverse_iterator<iterator>			reverse_iterator;
 	typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef std::ptrdiff_t							difference_type;
@@ -39,24 +39,33 @@ class vector
 	//---------------------------------------
 	//---------COPLIEN FORM FUNCTION---------
 	//---------------------------------------
-	explicit vector (const allocator_type& alloc = allocator_type()) : _allocator(alloc) //default constructor
+	explicit vector (const allocator_type& alloc = allocator_type()) : _alloc(alloc) //default constructor
 	{
-		_tab = 0
-		_size = 0
-		_capacity = 0
+		_tab = 0;
+		_size = 0;
+		_capacity = 0;
 		_start = 0;
 		_end = 0;
-		_end_capacity = 0;
+		_alloc = alloc;
+		//_end_capacity = 0;
 	}
 	
-	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _allocator(alloc) //fill constructor
+	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _alloc(alloc) //fill constructor
 	{
-		_tab = 0
-		_size = 0
-		_capacity = 0
+		_tab = 0;
+		_size = 0;
+		_capacity = 0;
 		_start = 0;
 		_end = 0;
-		_end_capacity = 0;
+		//_end_capacity = 0;
+
+		_alloc = alloc;
+		_start = _alloc.allocate(n);
+		_end = _start + n;
+		_size = n;
+		_capacity = n;
+		while (n--)
+			alloc.construct(val, _end - n);
 	}
 	
 	template <class InputIterator>
@@ -94,7 +103,7 @@ class vector
 		
 		iterator end()
 		{
-			return (_begin);
+			return (_end);
 		}
 		
 		reverse_iterator rbegin()
@@ -117,7 +126,7 @@ class vector
 		
 		size_type max_size() const
 		{
-			return (_allocator.max_size());
+			return (_alloc.max_size());
 		}
 		
 		void resize (size_type n, value_type val = value_type()) //Resizes the container so that it contains n elements.
@@ -129,7 +138,7 @@ class vector
 				while (n > this->size())
 				{
 					_end--;
-					_allocator.destroy(_end);
+					_alloc.destroy(_end);
 				}
 			}
 			//else // n > size
@@ -138,12 +147,12 @@ class vector
 		
 		size_type capacity() const
 		{
-			return (_end_capacity - _start);
+			return (_capacity);
 		}
 		
 		bool empty() const
 		{
-			if (!_end - _start)
+			if (_end == _start)
 				return (1);
 			return(0);
 		}
@@ -200,12 +209,12 @@ class vector
 		
 		value_type* data()
 		{
-			return (_tab);
+			return (_start);
 		}
 		
 		const value_type* data() const
 		{
-			return (_tab);
+			return (_start);
 		}
 		
 		//-------------------------
@@ -219,23 +228,48 @@ class vector
 		
 		void assign (size_type n, const value_type& val) //fill
 		{
-
+			
+			this->clear();
+			if (n > this->max_size())
+				throw (std::length_error("vector::resize"));
+			else if (n < this->size())
+			{
+				while (n > this->size())
+				{
+					_end--;
+					_alloc.destroy(_end);
+				}
+			}
+			//else // n > size
+				//insert()
 		}
 		
 		void push_back (const value_type& val)
 		{
-
+			if (!this->max_size() - _size)
+				;
+				//throw or alloc
+			else
+			{
+				_alloc.construct(val, end);
+				_size++;
+				_end++;
+			}
 		}
 		
 		void pop_back()
 		{
-			_allocator.destroy(_end - 1);
+			//if (!_size)
+			//	;
+				//throw std::;
+			_alloc.destroy(_end - 1);
 			_end--;
+			_size--;
 		}
 		
 		iterator insert (iterator position, const value_type& val) //single element
 		{
-
+			
 		}
 		
 		void insert (iterator position, size_type n, const value_type& val) //fill
@@ -249,27 +283,35 @@ class vector
 
 		}
 		
-		iterator erase (iterator position);iterator erase (iterator first, iterator last)
+		iterator erase (iterator position)
 		{
+			
+		}
 
+		iterator erase (iterator first, iterator last)
+		{
+			
 		}
 		
 		void swap (vector& x)
 		{
-
+				
 		}
 		
 		void clear()
 		{
-
+			int i = 0;
+			
+			while (_start != _end)
+				this->pop_back();
 		}
 		
 		//-------------------------
 		//--------Allocator--------
 		//-------------------------
-		allocator_type get_allocator() const
+		allocator_type get_alloc() const
 		{
-			return (_allocator);
+			return (_alloc);
 		}
 	
 	//---------------------------------------------
@@ -317,12 +359,12 @@ class vector
 		
 		value_type		*_tab;
 		size_type		_size;
-		//size_type		_capacity;
+		size_type		_capacity;
 		
-		allocator_type	_allocator;
+		allocator_type	_alloc;
 		pointer			_end;
 		pointer			_start;
-		pointer			_end_capacity;
+		//pointer			_end_capacity;
 };
 	
 }

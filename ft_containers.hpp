@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:33 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/19 17:22:39 by apommier         ###   ########.fr       */
+/*   Updated: 2022/10/28 17:39:13 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,5 +21,7 @@
 # include "./containers/stack.hpp"
 # include "./containers/vector.hpp"
 //}
+
+# include <iterator>
 
 #endif
