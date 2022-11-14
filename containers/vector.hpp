@@ -6,12 +6,14 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/28 17:58:43 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/14 06:50:18 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
+
+# include "./iterators/random_access_iterator.hpp"
 
 namespace ft
 {
@@ -27,15 +29,33 @@ class vector
 	typedef Allocator 								allocator_type;
 	typedef value_type& 							reference;
 	typedef const value_type&						const_reference;
-	typedef typename Allocator::pointer				pointer;
-	typedef typename Allocator::const_pointer		const_pointer;
-	typedef value_type*	iterator;
-	typedef value_type*	const_iterator;
+	typedef T*										pointer;
+	typedef const T*								const_pointer;
+	typedef ft::random_access_iterator<value_type>			iterator;
+	typedef const ft::random_access_iterator<value_type>	const_iterator;
 	typedef std::reverse_iterator<iterator>			reverse_iterator;
 	typedef std::reverse_iterator<const_iterator>	const_reverse_iterator;
 	typedef std::ptrdiff_t							difference_type;
 	typedef std::size_t								size_type;
 	 
+	
+	//-----------------------------
+	//-----PRIVATE MEMBER TYPE-----
+	//-----------------------------
+	private:
+
+		value_type				*_tab;
+		size_type				_size;
+		size_type				_capacity;
+		
+		allocator_type							_alloc;
+		ft::random_access_iterator<value_type>	_end;
+		ft::random_access_iterator<value_type>	_start;
+		
+		//pointer			_end_capacity;
+
+	public:
+	
 	//---------------------------------------
 	//---------COPLIEN FORM FUNCTION---------
 	//---------------------------------------
@@ -44,10 +64,13 @@ class vector
 		_tab = 0;
 		_size = 0;
 		_capacity = 0;
-		_start = 0;
-		_end = 0;
+		//_start = 0;
+		//_end = 0;
+
+		
 		_alloc = alloc;
-		//_end_capacity = 0;
+		_start = _alloc.allocate(0);
+		_end = _start;
 	}
 	
 	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _alloc(alloc) //fill constructor
@@ -55,24 +78,25 @@ class vector
 		_tab = 0;
 		_size = 0;
 		_capacity = 0;
-		_start = 0;
-		_end = 0;
-		//_end_capacity = 0;
 
 		_alloc = alloc;
-		_start = _alloc.allocate(n);
-		_end = _start + n;
+		_tab = _alloc.allocate(n);
+		_start = _tab;
 		_size = n;
 		_capacity = n;
+		_end = _start + n;
 		while (n--)
-			alloc.construct(val, _end - n);
+			_alloc.construct(_tab + n, val);
+		//_end = _start; 
+		//_start + 5;
+		///5 + _start;
 	}
 	
-	template <class InputIterator>
-	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) //range constructor
-	{
+	//template <class InputIterator>
+	//vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) //range constructor
+	//{
 
-	}
+	//}
 	
 	vector (const vector& x)//copy constructor
 	{
@@ -246,15 +270,15 @@ class vector
 		
 		void push_back (const value_type& val)
 		{
-			if (!this->max_size() - _size)
-				;
+			//if (!this->max_size() - _size)
+			//	;
 				//throw or alloc
-			else
-			{
-				_alloc.construct(val, end);
+			//else
+			//{
+				_alloc.construct(_end.getPointer() - 2, val);
 				_size++;
 				_end++;
-			}
+			//}
 		}
 		
 		void pop_back()
@@ -355,16 +379,7 @@ class vector
 	// }
 
 	
-	private:
-		
-		value_type		*_tab;
-		size_type		_size;
-		size_type		_capacity;
-		
-		allocator_type	_alloc;
-		pointer			_end;
-		pointer			_start;
-		//pointer			_end_capacity;
+
 };
 	
 }
