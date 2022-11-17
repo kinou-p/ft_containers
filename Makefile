@@ -6,13 +6,12 @@
 #    By: apommier <apommier@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/12 19:45:18 by apommier          #+#    #+#              #
-#    Updated: 2022/10/19 14:25:28 by apommier         ###   ########.fr        #
+#    Updated: 2022/11/16 21:54:17 by apommier         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= a.out
-SRCS	= tests/stack_test.cpp\
-			tests/main.cpp
+SRCS	= tests/main.cpp
 			
 			
 OBJS	= ${SRCS:.cpp=.o}

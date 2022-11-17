@@ -6,12 +6,14 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/30 16:14:35 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/14 06:27:37 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/16 19:21:41 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RANDOM_ACCESS_ITERATOR_HPP
 # define RANDOM_ACCESS_ITERATOR_HPP
+
+# include <cstddef>
 
 namespace ft 
 {
