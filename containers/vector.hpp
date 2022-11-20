@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/17 06:53:12 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/20 02:57:45 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define VECTOR_HPP
 
 # include "./iterators/random_access_iterator.hpp"
+# include "./iterators/enable_if.hpp"
+# include "./iterators/is_integral.hpp"
 
 # include <cstddef>
 # include <memory>
@@ -37,7 +39,7 @@ class vector
 	typedef T*												pointer;
 	typedef const T*										const_pointer;
 	typedef ft::random_access_iterator<value_type>			iterator;
-	typedef const ft::random_access_iterator<value_type>	const_iterator;
+	typedef ft::random_access_iterator<const value_type>	const_iterator;
 	typedef std::reverse_iterator<iterator>					reverse_iterator;
 	typedef std::reverse_iterator<const_iterator>			const_reverse_iterator;
 	typedef std::ptrdiff_t									difference_type;
@@ -49,7 +51,7 @@ class vector
 	//-----------------------------
 	private:
 
-		value_type				*_tab;
+		pointer					_tab;
 		size_type				_size;
 		size_type				_capacity;
 
@@ -74,35 +76,32 @@ class vector
 	
 	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _alloc(alloc) //fill constructor
 	{
-		_tab = 0;
-		_size = 0;
-		_capacity = 0;
-
-		_alloc = alloc;
 		_tab = _alloc.allocate(n);
 		_size = n;
 		_capacity = n;
 		while (n--)
 			_alloc.construct(_tab + n, val);
 	}
-	
+
 	vector (const vector& x)//copy constructor
 	{
 		*this = x;
 	}
-	
+
 	~vector()
 	{
-		if (_tab && _capacity)
+		if (_capacity)
 			_alloc.deallocate(_tab, _capacity);
 	}
 	
 	vector& operator= (const vector& x)//assignation operator
 	{
-			_tab = x._tab;
+			_alloc = x._alloc;
 			_size = x._size;
-			_capacity = x._capacity;
-			_alloc = x._alloc;  
+			_capacity = x._size;
+			_tab = _alloc.allocate(_size);
+			for (size_type i = 0; i < _size; i++)
+				_alloc.construct(_tab + i, x._tab[i]); 
 			return (*this);
 	}
 	
@@ -115,20 +114,40 @@ class vector
 		//-------------------------
 		iterator begin()
 		{
-			return (_tab);
+			return (iterator(_tab));
 		}
 		
+		const_iterator begin() const
+		{
+			return const_iterator(_tab);
+		}
+
 		iterator end()
 		{
-			return (_tab + _size);
+			return iterator(_tab + _size);
+		}
+
+		const_iterator end() const
+		{
+			return const_iterator(_tab + _size);
 		}
 		
 		reverse_iterator rbegin()
 		{
-			return (_tab + _size);
+			return iterator(_tab + _size);
+		}
+
+		const_reverse_iterator rbegin() const
+		{
+			return iterator(_tab + _size);
 		}
 		
 		reverse_iterator rend()
+		{
+			return (_tab);
+		}
+
+		const_reverse_iterator rend() const
 		{
 			return (_tab);
 		}
@@ -164,9 +183,10 @@ class vector
 				while (n > _size)
 				{
 					_alloc.construct(_tab + _size, val);
+					_size++;
 					//_end++;
 				}
-				_size = n;
+				//_size = n;
 			}
 		}
 		
@@ -214,13 +234,17 @@ class vector
 		reference at (size_type n)
 		{
 			//exception
-			return (_tab[n]);
+			if (n >= _size)
+				throw (std::out_of_range("ft::vector::at"));
+			return (*(_tab + n));
 		}
 		
 		const_reference at (size_type n) const
 		{
 			//exception
-			return (_tab[n]);
+			if (n >= _size)
+				throw (std::out_of_range("ft::vector::at"));
+			return (*(_tab + n));
 		}
 		
 		reference front()
@@ -235,12 +259,12 @@ class vector
 		
 		reference back()
 		{
-			return (*(_tab + _size));
+			return (*(_tab + _size - 1));
 		}
 		
 		const_reference back() const
 		{
-			return (*(_tab + _size));
+			return (*(_tab + _size - 1));
 		}
 		
 		value_type* data()
@@ -256,8 +280,10 @@ class vector
 		//-------------------------
 		//--------Modifiers--------
 		//-------------------------
+
 		template <class InputIterator>
-		void assign (InputIterator first, InputIterator last) //range
+		//void assign (InputIterator first, InputIterator last) //range
+		void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
 		{
 			this->clear();
 			while (first < last)
@@ -277,12 +303,13 @@ class vector
 				_alloc.construct(_tab + n, val);
 		}
 		
-		void push_back (const value_type& val)
+		void push_back (const_reference val)
 		{
 			if (!_capacity)
 				this->reserve(1);
 			else if (_size == _capacity)
-				this->reserve(_size);
+				this->reserve(_size * 2);
+			//std::cout << "coucou1\n";
 			_alloc.construct(_tab + _size, val);
 			_size++;
 		}
@@ -299,6 +326,7 @@ class vector
 		iterator insert (iterator position, const value_type& val) //single element
 		{
 			this->insert(position, 1, val);
+			return (position);
 		}
 		
 		void insert (iterator position, size_type n, const value_type& val) //fill
@@ -335,11 +363,11 @@ class vector
 			if (_size + (last - first) > this->max_size())
 				throw (std::length_error("vector::resize"));
 			tmp = _alloc.allocate(_size + (last - first));
-			for (i = 0; i < position; i++)
+			for (i = 0; i < position - _tab; i++)
 				tmp[i] = _tab[i];
 			while (first + j != last)
 			{
-				tmp[i + j] = *(first + j);
+				tmp[i + j] = *(j + first);
 				j++;
 			}
 			while (_size - i)
@@ -352,31 +380,42 @@ class vector
 
 		iterator erase (iterator position)
 		{
-			iterator ret = position;
-			_alloc.destroy(position);
-			while (_tab + _size - 1 > position + _tab)
+			_alloc.destroy(&(*position));
+			// while (_tab + _size - 1 > _tab + (position - _tab))
+			// {
+			// 	*position = *(position + 1);
+			// 	position++;
+			// 	_alloc.destroy(&(*position));
+			// }
+			for (size_type i = 0; _tab + _size - 1 > _tab + (position - _tab + i); i++)
 			{
-				*position = *(position + 1);
-				position++;
-				_alloc.destroy(position);
+				_alloc.construct(&(*(position + i)), *(position + i + 1));
+				_alloc.destroy(&(*(position + i + 1)));
 			}
 			_size--;
-			return (ret + 1);
+			return (position);
 		}
 
 		iterator erase (iterator first, iterator last)
 		{
 			difference_type lenght = last - first;
-			
-			for (int i = 0; lenght - i; i++)
-				_alloc.destroy(first + i);
-			while (_tab + _size - 1 != _tab + lenght)
+			//std::cout << "diff = " << lenght << std::endl;
+
+			int i;
+			for (i = 0; lenght - i - 1; i++)
+				_alloc.destroy(&(*(first + i)));
+			for (i = 0; _size - i - 1; i++)
 			{
-				*first = *(first + lenght);
-				first++;
-				_alloc.destroy(first + lenght);
-			}	
-			return (last + 1);
+				_alloc.construct(&(*(first + i)), *(first + lenght + i));
+				_alloc.destroy(&(*(first + lenght + i )));
+			}
+			// for (; _size - lenght - i; i++)
+			// {
+			// 	_alloc.construct(&(*(first + i)), *(first + lenght + i));
+			// 	_alloc.destroy(&(*(first + _size - lenght + i )));
+			// }
+			_size -= lenght;
+			return (first);
 		}
 		
 		void swap (vector& x)

@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:25 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/17 07:41:22 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/18 11:58:52 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,19 @@ class map
 	//---------MEMBER TYPE---------
 	//-----------------------------
 
-	typedef	Key							key_type;
-	typedef	T							mapped_type;
-	typedef	std::pair<const Key, T>		value_type;
-	typedef	std::size_t					size_type;
-	typedef	std::ptrdiff_t				difference_type;
-	typedef	Compare						key_compare;
-	typedef	Allocator					allocator_type;
-	typedef	value_type&					reference;
-	typedef	const value_type&			const_reference;
-	typedef	Allocator::pointer			pointer;
-	typedef	Allocator::const_pointer	const_pointer;
-	typedef	LegacyBidirectionalIterator	iterator;
-	typedef	LegacyBidirectionalIterator	const_iterator;
+	typedef	Key										key_type;
+	typedef	T										mapped_type;
+	typedef	std::pair<const Key, T>					value_type;
+	typedef	std::size_t								size_type;
+	typedef	std::ptrdiff_t							difference_type;
+	typedef	Compare									key_compare;
+	typedef	Allocator								allocator_type;
+	typedef	value_type&								reference;
+	typedef	const value_type&						const_reference;
+	typedef	Allocator::pointer						pointer;
+	typedef	Allocator::const_pointer				const_pointer;
+	typedef	LegacyBidirectionalIterator				iterator;
+	typedef	LegacyBidirectionalIterator				const_iterator;
 	typedef	std::reverse_iterator<iterator>			reverse_iterator;
 	typedef	std::reverse_iterator<const_iterator>	const_reverse_iterator;
 
@@ -51,26 +51,37 @@ class map
 	//-----------------------------
 	private :
 
-		pointer _start;
+		pointer			_start;
+		pointer			_end;
+		size_type		_size;
+		size_type		_capacity;
+		allocator_type	_alloc;
 
 	public :
 	
 	//---------------------------------------
 	//---------COPLIEN FORM FUNCTION---------
 	//---------------------------------------
-	map();
+	map()
+	{
+		_start = 0;
+		_end = 0;
+		_size = 0;
+		_capacity = 0;
+		_alloc = 0;
+		
+	}
+	
 	explicit map( const Compare& comp, const Allocator& alloc = Allocator() )
 	{
 		
 	}
-	
 	
 	template< class InputIt >
 	map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() )
 	{
 		
 	}
-	
 	
 	map( const map& x)
 	{
@@ -81,14 +92,12 @@ class map
 	{
 		
 	}
-	
 
 	map& operator=( const map& x )
 	{
 		
 	}
 	
-
 	//----------------------------------
 	//---------MEMBER FUNCTION----------
 	//----------------------------------
@@ -218,7 +227,6 @@ class map
 		
 	}
 	
-
 		//-------------------------
 		//--------Observers--------
 		//-------------------------
@@ -282,7 +290,6 @@ class map
 		
 	}
 	
-
 };
 
 }
