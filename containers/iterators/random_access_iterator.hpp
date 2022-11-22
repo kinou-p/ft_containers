@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/30 16:14:35 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/22 08:10:53 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/22 10:55:39 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,14 @@ namespace ft
 		
 		random_access_iterator &operator ++()
 		{
+			//std::cout << "operandom ++\n";
 			_ptr++; 
 			return (*this);
 		}
 		
 		random_access_iterator operator ++(int)
 		{
+			//std::cout << "operandom 1 ++\n";
 			random_access_iterator tmp(*this);
 			++(*this);
 			return (tmp);
@@ -93,12 +95,14 @@ namespace ft
 
 		random_access_iterator &operator --()
 		{
+			//std::cout << "operandom --\n";
 			_ptr--;
 			return (*this);
 		}
 		
 		random_access_iterator operator --(int)
 		{
+			//std::cout << "operandom 1 --\n";
 			random_access_iterator tmp(*this);
 			--(*this);
 			return (tmp);			
