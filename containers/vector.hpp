@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/22 11:24:31 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/22 14:20:29 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -481,54 +481,17 @@ class vector
 		friend bool operator>  (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
 		template <class Temp, class Alloc>
 		friend bool operator>= (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+};
 
 	//---------------------------------------------
 	//---------OPERATOR OVERLOAD FUNCTION----------
 	//---------------------------------------------
-
-	// template <class T, class Alloc>
-	// bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-	// {
-	
-	// }
-	
-	// template <class T, class Alloc>
-	// bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-	// {
-	
-	// }
-	
-	// template <class T, class Alloc>
-	// bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-	// {
-	
-	// }
-	
-	// template <class T, class Alloc>
-	// bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-	// {
-	
-	// }
-	
-	// template <class T, class Alloc>
-	// bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-	// {
-	
-	// }
-	
-	// template <class T, class Alloc>
-	// bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
-	// {
-	
-	// }
-};
 	
 	template <class T, class Alloc>  
 	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
 		if (lhs._size != rhs._size)
 			return (lhs._size == rhs._size);
-		
 		int i = 0;
 		while (lhs._size - i && lhs._tab[i] == rhs._tab[i])
 			i++;
