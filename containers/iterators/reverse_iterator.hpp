@@ -6,14 +6,14 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/19 05:14:31 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/19 05:49:52 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/22 06:15:05 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REVERSE_ITERATOR_HPP
-# define REVERSE_ITERATOR_HPP
+#pragma once
 
 # include <cstddef>
+# include "./iterator_traits.hpp"
 
 namespace ft 
 {
@@ -28,10 +28,10 @@ namespace ft
 		typedef	typename ft::iterator_traits<Iter>::difference_type		difference_type;
 		typedef	typename ft::iterator_traits<Iter>::pointer				pointer;
 		typedef	typename ft::iterator_traits<Iter>::reference			reference;
-		
+
 		private:	
 			
-			Iter	_Ite;
+			iterator_type	_Ite;
 
 		public:
 		
@@ -39,25 +39,63 @@ namespace ft
 		//--------CONSTRUCTOR DESTRUCTOR---------
 		//---------------------------------------
 		
-		reverse_iterator(){}
-		reverse_iterator(pointer Ite){}
-		reverse_iterator(reverse_iterator const &cpy) {}
-
-		~reverse_iterator(){}
+		reverse_iterator() : _Ite() {}
+		explicit reverse_iterator (iterator_type it) { _Ite = iterator_type(it); }
 		
+		template<typename It>
+		reverse_iterator(const reverse_iterator<It> &rev_it)
+		{
+			_Ite = rev_it.base(); 
+		}
+
 		reverse_iterator &operator=(reverse_iterator const &cpy)
 		{
-			_Ite = cpy._Ite;
+			_Ite = iterator_type(cpy._Ite); 
 			return (*this);
 		}
+		
+		virtual ~reverse_iterator(){}
 		
 		//---------------------------------------
 		//-------------COMPARAISON---------------
 		//---------------------------------------
+		
+		bool operator== (reverse_iterator const &rhs) const { return (_Ite == rhs._Ite); }
+		bool operator!= (reverse_iterator const &rhs) const { return (_Ite != rhs._Ite); }
+		bool operator<  (reverse_iterator const &rhs) const { return (_Ite > rhs._Ite); }
+		bool operator<= (reverse_iterator const &rhs) const { return (_Ite >= rhs._Ite); }
+		bool operator>  (reverse_iterator const &rhs) const { return (_Ite < rhs._Ite); }
+		bool operator>= (reverse_iterator const &rhs) const { return (_Ite <= rhs._Ite); }
 
 		//---------------------------------------
 		//-------------INCREMENTERS--------------
 		//---------------------------------------
+
+		reverse_iterator& operator++()
+		{
+			--_Ite;
+			return (*this);
+		}
+		
+		reverse_iterator  operator++(int) 
+		{
+			reverse_iterator tmp = *this;
+			--_Ite;
+			return (tmp);
+		}
+		
+		reverse_iterator& operator--() 
+		{
+			++_Ite;
+			return (*this);
+		}
+		
+		reverse_iterator  operator--(int)
+		{
+			reverse_iterator tmp = *this;
+			++_Ite;
+			return (tmp);
+		}
 
 		//---------------------------------------
 		//----------------ADRESS-----------------
@@ -65,19 +103,57 @@ namespace ft
 
 		reference operator *() { return (*_Ite); }
 		const reference operator *() const { return (*_Ite); }
-		pointer operator ->() { return (_Ite); }
-		const pointer operator ->() const { return (_Ite); }
+		pointer operator ->() { return (_Ite.getPointer()); }
+		const pointer operator ->() const { return (_Ite.getPointer()); }
 		reference operator [](difference_type nbr) const { return (*(_Ite + nbr)); }
 
 		//---------------------------------------
 		//--------------OPERATION----------------
 		//---------------------------------------
 
+		// reverse_iterator operator+ (difference_type n) const { return reverse_iterator<iterator_type>(_Ite - n); }
+		// reverse_iterator& operator+= (difference_type n) { return reverse_iterator<iterator_type>(_Ite -= n); }
+		// reverse_iterator operator- (difference_type n) const { return reverse_iterator<iterator_type>(_Ite + n); }
+		// reverse_iterator& operator-= (difference_type n) { return reverse_iterator<iterator_type>(_Ite += n); }
+
+		reverse_iterator operator+ (difference_type n) const { return reverse_iterator(_Ite - n); }
+		
+		friend reverse_iterator operator +(difference_type lhs, reverse_iterator const& rhs) { return (rhs + lhs); } // n + a
+
+		reverse_iterator& operator+= (difference_type n)
+		{
+			_Ite -= n;
+			return (*this);
+		}
+		
+		reverse_iterator operator- (difference_type n) const { return reverse_iterator(_Ite + n); }
+		
+		difference_type operator- (reverse_iterator const &lhs) const { return (_Ite - lhs._Ite); }
+
+		reverse_iterator& operator-= (difference_type n)
+		{
+			//std::cout << "its me\n";
+			_Ite += n;
+			return (*this);
+		}
+
+
+		// template <class Iterator>
+		// reverse_iterator<Iterator> operator+ (typename reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator>& rev_it)
+		// {
+			
+		// }
+
+		// template <class Iterator>
+		// typename reverse_iterator<Iterator>::difference_type operator- ( const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+		// {
+			
+		// }
+
 		//---------------------------------
 		//--------------GET----------------
 		//---------------------------------
 
+		iterator_type base() const { return iterator_category(_Ite); }
 	};
-
-	
 }

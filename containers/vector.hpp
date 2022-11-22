@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/20 02:57:45 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/21 18:48:56 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "./iterators/random_access_iterator.hpp"
 # include "./iterators/enable_if.hpp"
 # include "./iterators/is_integral.hpp"
+# include "./iterators/reverse_iterator.hpp"
 
 # include <cstddef>
 # include <memory>
@@ -40,8 +41,8 @@ class vector
 	typedef const T*										const_pointer;
 	typedef ft::random_access_iterator<value_type>			iterator;
 	typedef ft::random_access_iterator<const value_type>	const_iterator;
-	typedef std::reverse_iterator<iterator>					reverse_iterator;
-	typedef std::reverse_iterator<const_iterator>			const_reverse_iterator;
+	typedef ft::reverse_iterator<iterator>					reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 	typedef std::ptrdiff_t									difference_type;
 	typedef std::size_t										size_type;
 	 
@@ -90,12 +91,18 @@ class vector
 
 	~vector()
 	{
-		if (_capacity)
+		//std::cout << "destct" << std::endl;
+		if (_capacity == 0)
+		{
 			_alloc.deallocate(_tab, _capacity);
+			_capacity = 0;
+		}
+		//std::cout << "destct end" << std::endl;
 	}
 	
 	vector& operator= (const vector& x)//assignation operator
 	{
+			//this->~vector();
 			_alloc = x._alloc;
 			_size = x._size;
 			_capacity = x._size;
@@ -134,22 +141,22 @@ class vector
 		
 		reverse_iterator rbegin()
 		{
-			return iterator(_tab + _size);
+			return reverse_iterator(_tab);
 		}
 
 		const_reverse_iterator rbegin() const
 		{
-			return iterator(_tab + _size);
+			return const_reverse_iterator(_tab);
 		}
 		
 		reverse_iterator rend()
 		{
-			return (_tab);
+			return reverse_iterator(_tab + _size);
 		}
 
 		const_reverse_iterator rend() const
 		{
-			return (_tab);
+			return const_reverse_iterator(_tab + _size);
 		}
 		
 		//------------------------
@@ -167,7 +174,7 @@ class vector
 		
 		void resize (size_type n, value_type val = value_type()) //Resizes the container so that it contains n elements.
 		{
-			
+			//std::cout << "resize------val = " << val << std::endl;
 			if (n < _size) 
 			{
 				while (n < _size)
@@ -186,8 +193,9 @@ class vector
 					_size++;
 					//_end++;
 				}
-				//_size = n;
+				
 			}
+			//_size = n;
 		}
 		
 		size_type capacity() const
@@ -450,6 +458,30 @@ class vector
 			return (_alloc);
 		}
 	
+		//-------------------------
+		//-------Comparaison-------
+		//-------------------------
+
+		// bool operator ==(const random_access_iterator &b) { return (this->_tab == b); }
+		// bool operator !=(const random_access_iterator &b) { return (this->_tab != b); }
+		// bool operator <(const random_access_iterator &b) { return (this->_tab < b); }
+		// bool operator >(const random_access_iterator &b) { return (this->_tab > b); }
+		// bool operator <=(const random_access_iterator &b) { return (this->_tab <= b); }
+		// bool operator >=(const random_access_iterator &b) { return (this->_tab >= b); }
+		
+		template <class Temp, class Alloc>
+		friend bool operator== (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+		template <class Temp, class Alloc>
+		friend bool operator!= (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+		template <class Temp, class Alloc>
+		friend bool operator<  (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs); 
+		template <class Temp, class Alloc>
+		friend bool operator<= (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+		template <class Temp, class Alloc>
+		friend bool operator>  (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+		template <class Temp, class Alloc>
+		friend bool operator>= (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+
 	//---------------------------------------------
 	//---------OPERATOR OVERLOAD FUNCTION----------
 	//---------------------------------------------
@@ -490,6 +522,58 @@ class vector
 	
 	// }
 };
+	
+	template <class T, class Alloc>  
+	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		if (lhs._size != rhs._size)
+			return (lhs._size == rhs._size);
+		
+		int i = 0;
+		while (lhs._size - i && lhs._tab[i] == rhs._tab[i])
+			i++;
+		return (lhs._tab[i] == rhs._tab[i]);
+	}
+	
+	template <class T, class Alloc>  
+	bool operator!= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (!(lhs == rhs));
+	}
+	
+	template <class T, class Alloc>  
+	bool operator<  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		int i = 0;
+		while (lhs._size - i && rhs._size - i && lhs._tab[i] == rhs._tab[i])
+			i++;
+		if (!(lhs._size - i) && rhs._size - i)
+			return true;
+		if (!(rhs._size - i) && lhs._size - i)
+			return false;
+		if (!(lhs._size - i) && !(rhs._size - i))
+			return false;
+		return (lhs._tab[i] < rhs._tab[i]);
+	}
+	
+	template <class T, class Alloc>  
+	bool operator<= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (!(rhs < lhs));
+	}
+	
+	template <class T, class Alloc>  
+	bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (rhs < lhs);
+	}
+	
+	template <class T, class Alloc>  
+	bool operator>= (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
+	{
+		return (!(lhs < rhs));
+	}
+	
 	
 }
 #endif
