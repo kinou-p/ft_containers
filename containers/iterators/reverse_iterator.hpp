@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/19 05:14:31 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/22 06:15:05 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/22 08:23:53 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,30 +42,43 @@ namespace ft
 		reverse_iterator() : _Ite() {}
 		explicit reverse_iterator (iterator_type it) { _Ite = iterator_type(it); }
 		
+		//reverse_iterator(const reverse_iterator<It> &rev_it) : _Ite(rev_it.base()) {}
+
 		template<typename It>
 		reverse_iterator(const reverse_iterator<It> &rev_it)
 		{
-			_Ite = rev_it.base(); 
-		}
-
-		reverse_iterator &operator=(reverse_iterator const &cpy)
-		{
-			_Ite = iterator_type(cpy._Ite); 
-			return (*this);
+			*this = rev_it;
 		}
 		
 		virtual ~reverse_iterator(){}
+		// reverse_iterator(const reverse_iterator<It> &rev_it)
+		// {
+		// 	_Ite = It(rev_it.base());
+		// }
+		// operator reverse_iterator<Iter>() const 
+		// {
+		// 	return (reverse_iterator< Iter const>(_Ite));
+		// }
 		
+		template<typename It>
+		reverse_iterator operator=(reverse_iterator<It> const &cpy)
+		{
+			_Ite = cpy.base(); 
+			return (*this);
+		}
+		
+
+
 		//---------------------------------------
 		//-------------COMPARAISON---------------
 		//---------------------------------------
 		
-		bool operator== (reverse_iterator const &rhs) const { return (_Ite == rhs._Ite); }
-		bool operator!= (reverse_iterator const &rhs) const { return (_Ite != rhs._Ite); }
-		bool operator<  (reverse_iterator const &rhs) const { return (_Ite > rhs._Ite); }
-		bool operator<= (reverse_iterator const &rhs) const { return (_Ite >= rhs._Ite); }
-		bool operator>  (reverse_iterator const &rhs) const { return (_Ite < rhs._Ite); }
-		bool operator>= (reverse_iterator const &rhs) const { return (_Ite <= rhs._Ite); }
+		// bool operator== (reverse_iterator const &rhs) const { return (_Ite == rhs.base()); }
+		// bool operator!= (reverse_iterator const &rhs) const { return (_Ite != rhs.base()); }
+		// bool operator<  (reverse_iterator const &rhs) const { return (_Ite > rhs.base()); }
+		// bool operator<= (reverse_iterator const &rhs) const { return (_Ite >= rhs.base()); }
+		// bool operator>  (reverse_iterator const &rhs) const { return (_Ite < rhs.base()); }
+		// bool operator>= (reverse_iterator const &rhs) const { return (_Ite <= rhs.base()); }
 
 		//---------------------------------------
 		//-------------INCREMENTERS--------------
@@ -154,6 +167,26 @@ namespace ft
 		//--------------GET----------------
 		//---------------------------------
 
-		iterator_type base() const { return iterator_category(_Ite); }
+		iterator_type base() const { return _Ite; }
 	};
+
+		template<class Ite1, class Ite2>
+		bool operator== (const reverse_iterator<Ite1> &lhs, const reverse_iterator<Ite2> &rhs) { return (lhs.base() == rhs.base()); }
+		
+		template<class Ite1, class Ite2>
+		bool operator!= (const reverse_iterator<Ite1> &lhs, const reverse_iterator<Ite2> &rhs) { return (lhs.base() != rhs.base()); }
+		
+		template<class Ite1, class Ite2>
+		bool operator<  (const reverse_iterator<Ite1> &lhs, const reverse_iterator<Ite2> &rhs) { return (lhs.base() > rhs.base()); }
+		
+		template<class Ite1, class Ite2>
+		bool operator<= (const reverse_iterator<Ite1> &lhs, const reverse_iterator<Ite2> &rhs) { return (lhs.base() >= rhs.base()); }
+		
+		template<class Ite1, class Ite2>
+		bool operator>  (const reverse_iterator<Ite1> &lhs, const reverse_iterator<Ite2> &rhs) { return (lhs.base() < rhs.base()); }
+		
+		template<class Ite1, class Ite2>
+		bool operator>= (const reverse_iterator<Ite1> &lhs, const reverse_iterator<Ite2> &rhs) { return (lhs.base() <= rhs.base()); }
+
+
 }

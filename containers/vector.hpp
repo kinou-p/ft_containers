@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/21 18:48:56 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/22 07:46:32 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class vector
 	typedef T*												pointer;
 	typedef const T*										const_pointer;
 	typedef ft::random_access_iterator<value_type>			iterator;
-	typedef ft::random_access_iterator<const value_type>	const_iterator;
+	typedef ft::random_access_iterator< value_type const>	const_iterator;
 	typedef ft::reverse_iterator<iterator>					reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 	typedef std::ptrdiff_t									difference_type;

@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/30 16:14:35 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/21 15:54:44 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/22 08:10:53 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,20 +40,32 @@ namespace ft
 		
 		random_access_iterator(){ _ptr = NULL;}
 		random_access_iterator(pointer ptr){ _ptr = ptr;}
-		random_access_iterator(random_access_iterator const &cpy) {*this = cpy;}
+		random_access_iterator(const random_access_iterator &cpy) {*this = cpy;}
 
 		~random_access_iterator(){}
 		
-		random_access_iterator &operator=(random_access_iterator const &cpy)
+		// random_access_iterator &operator=(const random_access_iterator  &cpy)
+		// {
+		// 	_ptr = cpy._ptr;
+		// 	return (*this);
+		// }
+
+
+		operator random_access_iterator<const value_type>() const
 		{
-			_ptr = cpy._ptr;
+		 	return (random_access_iterator<const value_type>(_ptr));
+		}
+		
+		random_access_iterator &operator=(random_access_iterator const &rhs)
+		{
+			if (this != &rhs) 
+			{
+				this->_ptr = rhs._ptr;
+			}
 			return (*this);
 		}
 
-		operator random_access_iterator<value_type const>() const
-		{
-			return (random_access_iterator<value_type const>(_ptr));
-		}
+
 		// random_access_iterator &operator=(pointer &ptr)
 		// {
 		// 	_ptr = ptr;
