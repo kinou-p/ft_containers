@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/19 05:14:31 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/22 11:41:22 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/23 10:59:47 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,16 +123,28 @@ namespace ft
 			tmp--;
 			return (*tmp);
 		}
-		
+
 		const reference operator *() const
 		{
 			iterator_type tmp(_Ite);
 			tmp--;
 			return (*tmp);
 		}
+
+		pointer operator ->() 
+		{
+			iterator_type tmp(_Ite);
+			tmp--;
+			return (&(*tmp));
+		}
+
+		const pointer operator ->() const 
+		{
+			iterator_type tmp(_Ite);
+			tmp--;
+			return (&(*tmp));
+		}
 		
-		pointer operator ->() { return (_Ite.getPointer()); }
-		const pointer operator ->() const { return (_Ite.getPointer()); }
 		reference operator [](difference_type nbr) const { return (*(_Ite - nbr - 1)); }
 
 		//---------------------------------------
