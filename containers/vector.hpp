@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/22 14:20:29 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/25 15:54:52 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "./iterators/enable_if.hpp"
 # include "./iterators/is_integral.hpp"
 # include "./iterators/reverse_iterator.hpp"
+//# include "./iterators/iterator_traits.hpp"
 
 # include <cstddef>
 # include <memory>
@@ -45,6 +46,7 @@ class vector
 	typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 	typedef std::ptrdiff_t									difference_type;
 	typedef std::size_t										size_type;
+	//typedef random_access_iterator							iterator_category;
 	 
 	
 	//-----------------------------

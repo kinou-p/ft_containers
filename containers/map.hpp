@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/24 08:50:18 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/24 17:45:57 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/25 17:48:41 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "./iterators/bidirectionnal_iterator.hpp"
 #include "./iterators/pair.hpp"
+#include "vector.hpp"
 
 #define RED 1
 #define BLACK 0
@@ -27,7 +28,7 @@ template<
 	class Key,
 	class T,
 	class Compare = std::less<Key>,
-	class Allocator = std::allocator<std::pair<const Key, T>>>
+	class Allocator = std::allocator<ft::pair<const Key, T>>>
 
 class map
 {
@@ -40,18 +41,19 @@ class map
 
 	typedef	Key													key_type;
 	typedef	T													mapped_type;
-	typedef	std::pair<const Key, T>								value_type;
+	typedef	ft::pair<const Key, T>								value_type;
 	typedef	std::size_t											size_type;
 	typedef	std::ptrdiff_t										difference_type;
 	typedef	Compare												key_compare;
+	typedef	Compare												value_compare;
 	typedef	Allocator											allocator_type;
 	typedef typename Allocator::template rebind<node>::other	node_allocator_type;
 	typedef	value_type&											reference;
 	typedef	const value_type&									const_reference;
 	typedef	typename Allocator::pointer							pointer;
 	typedef	typename Allocator::const_pointer					const_pointer;
-	typedef	ft::bidirectionnal_iterator							iterator; 
-	typedef	ft::bidirectionnal_iterator							const_iterator;
+	typedef	ft::bidirectionnal_iterator<value_type, node>					iterator; 
+	typedef	ft::bidirectionnal_iterator<value_type const, node const>	const_iterator;
 	typedef	std::reverse_iterator<iterator>						reverse_iterator;
 	typedef	std::reverse_iterator<const_iterator>				const_reverse_iterator;
 
@@ -84,20 +86,20 @@ class map
 	//---------COPLIEN FORM FUNCTION---------
 	//---------------------------------------
 	
-	explicit map( const Compare& comp = Compare(), const Allocator& alloc = Allocator() )
+	explicit map( const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : _alloc(alloc)
 	{
 		
 	}
 	
 	template< class InputIt >
-	map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() )
+	map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : _alloc(alloc)
 	{
 		
 	}
 	
 	map( const map& x)
 	{
-		
+		*this = x;
 	}
 	
 	~map()
@@ -105,9 +107,14 @@ class map
 		
 	}
 
-	map& operator=( const map& x )
+	map& operator=(const map& x)
 	{
-		
+		_comp = x->_comp;
+		_alloc = x->_alloc;
+		_node_alloc = x->_node_alloc;
+		_root = x->_root;
+		_end = x->_end;
+		_size = x->_size;
 	}
 	
 	//----------------------------------
@@ -119,42 +126,42 @@ class map
 		//-------------------------
 	iterator begin()
 	{
-		
+		return iterator(_root);
 	}
 	
 	const_iterator begin() const
 	{
-		
+		return const_iterator(_root);
 	}
 	
 	iterator end()
 	{
-		
+		return iterator(_end);
 	}
 	
 	const_iterator end() const
 	{
-		
+		return const_iterator(_end);
 	}
 	
 	reverse_iterator rbegin()
 	{
-		
+		return reverse_iterator(this->end());
 	}
 	
 	const_reverse_iterator rbegin() const
 	{
-		
+		return const_reverse_iterator(this->end());
 	}
 	
 	reverse_iterator rend()
 	{
-		
+		return reverse_iterator(this->begin());
 	}
 	
 	const_reverse_iterator rend() const
 	{
-		
+		return const_reverse_iterator(this->begin());
 	}
 	
 	
@@ -185,17 +192,32 @@ class map
 		//------------------------------
 	mapped_type& operator[] (const key_type& k)
 	{
+		iterator tmp = this->find(k);
 		
+		if (tmp->m == _end)
+			return (*((this->insert(make_pair(k, mapped_type()))).second)); //??????
+		else
+			return (*tmp.pair->second);
 	}
 	
 	mapped_type& at (const key_type& k)
 	{
+		iterator tmp = this->find(k);
 		
+		if (tmp->m == _end)
+			throw (std::out_of_range("ft::map::at"));
+		else
+			return (*tmp.pair->second);
 	}
 	
 	const mapped_type& at (const key_type& k) const
 	{
+		iterator tmp = this->find(k);
 		
+		if (tmp->m == _end)
+			throw (std::out_of_range("ft::map::at"));
+		else
+			return (*tmp.pair->second);
 	}
 	
 
@@ -204,7 +226,7 @@ class map
 		//-------------------------
 	ft::pair<iterator,bool> insert (const value_type& val)
 	{
-		
+		 
 	}	
 	
 	iterator insert (iterator position, const value_type& val)
@@ -234,7 +256,28 @@ class map
 	
 	void swap (map& x)
 	{
-		
+		map tmp;
+
+		tmp->_comp = _comp;
+		tmp->_alloc = _alloc;
+		tmp->_node_alloc = _node_alloc;
+		tmp->_root = _root;
+		tmp->_end = _end;
+		tmp->_size = _size;
+
+		_comp = x->_comp;
+		_alloc = x->_alloc;
+		_node_alloc = x->_node_alloc;
+		_root = x->_root;
+		_end = x->_end;
+		_size = x->_size;
+
+		x->_comp = tmp-> _comp;
+		x->_alloc = tmp->_alloc;
+		x->_node_alloc = tmp->_node_alloc;
+		x->_root = tmp->_root;
+		x->_end = tmp->_end;
+		x->_size = tmp->_size;
 	}
 	
 	void clear()
@@ -263,17 +306,37 @@ class map
 
 	iterator find (const key_type& k)
 	{
+		node *x = _root;
 		
+		while (x != _end && x->pair->first != k)
+		{
+			if (k > x->pair->first)
+				x = x->left;
+			else
+				x = x->right;
+		}
+		return (iterator(x));
 	}
 	
 	const_iterator find (const key_type& k) const
 	{
+		node *x = _root;
 		
+		while (x != _end && x->pair->first != k)
+		{
+			if (k > x->pair->first)
+				x = x->left;
+			else
+				x = x->right;
+		}
+		return (iterator(x));
 	}
 	
 	size_type count (const key_type& k) const
 	{
-		
+		if (find(k)->m == _end)
+			return (0);
+		return (1);
 	}
 	
 	iterator lower_bound (const key_type& k)
@@ -312,13 +375,43 @@ class map
 
 	private :
 	
+	void inorderHelper()
+	{
+	    if (_root == NULL)
+	        return;
+	    inorderHelper(_root->left);
+	    std::cout << _root->data << "  ";
+	    inorderHelper(_root->right);
+	}
+	
+	void levelOrderHelper()
+	{
+    	if (_root == NULL)
+    	    return;
+    	ft::vector<node *> v;
+    	v.push(_root);
+    	while (!v.empty())
+    	{
+    	    node *temp = v.front();
+    	    std::cout << temp->data << "  ";
+    	    v.pop();
+    	    if (temp->left != NULL)
+    	        v.push(temp->left);
+    	    if (temp->right != NULL)
+    	        v.push(temp->right);
+    	}
+	}
+
 	template<typename T_node>
 	node *new_node(key_type key, mapped_type val)
 	{
 		node *ret;
-		
-		ret = _node_alloc::allocate(1);
-		_node_alloc::construct(ret, node(key, val));
+
+		ret = _alloc.allocate(1);
+		_alloc.construct(ret, node(key, val));
+
+		//ret = _node_alloc::allocate(1);
+		//_node_alloc::construct(ret, node(key, val));
 		return (ret);
 	}
 
@@ -358,15 +451,119 @@ class map
 		elem->parent = pt_left;
 	}
 
-	void delete_fix()
+	void delete_node(node *z)
 	{
+		node *x;
+		node *y;
 		
-	} 
+		if (z->left == _end || z->right == _end)//case1
+			y = z;
+		// else //case2
+		// 	y = TREE-SUCCESSOR(z);
+		if (y->left != _end)
+			x = y->left;
+		else
+			x = y->right;
+		x->parent = y->parent; // Do this, even if x is _end
+		if (y->parent == _end)
+			_root = x;
+		else if (y == y->parent->left) //(*if y is a left child.*)
+			y->parent->left = x;
+		else 
+			y->parent->right = x; //(*if y is a right child.*)
+		if (y != z )
+			z->pair->first = y->pair->first;
+		//copy y’s satellite data into z
+		if (y->color == BLACK)
+			delete_fix(x);
+		return (y);
+	}
 
-	void delete_node()
+	void delete_fix(node *x)
 	{
+		node *w;
+		node *z;
 		
-	} 
+		while (x != _root && x->color == BLACK)
+		{
+			if (x == x->parent->left)
+			{
+				w = x->parent->right;
+				if (w->color == RED) // Case 1
+				{
+					w->color = BLACK;
+					x->parent->color = RED;
+					left_rotate(x->parent);
+					w = x->parent->right;
+				}
+				if (w->left->color == BLACK && w->right->color == BLACK)// Case 2
+				{
+					w->color = RED; 
+					x = x->parent;
+					x->parent = z->parent->parent;
+				}
+				else if (w->right->color == BLACK) // Case 3
+				{
+					w->left->color = BLACK;
+					w->color = RED;
+					right_rotate(w);
+					w = x->parent->right;
+				}
+				w->color = x->parent->color; // Case 4
+				x->parent->color = BLACK; // Case 4
+				w->right->color = BLACK; // Case 4
+				left_rotate(x->parent); // Case 4
+				x = _root; // Case 4
+			}
+			else //same as 3 - 21 with “right” and “left” exchanged
+			{
+				w = x->parent->left;
+				if (w->color == RED) // Case 1
+				{
+					w->color = BLACK; // Case 1
+					x->parent->color = RED; // Case 1
+					right_rotate(x->parent); // Case 1
+					w = x->parent->left; // Case 1
+				}
+				if (w->right->color == BLACK && w->left->color == BLACK)
+				{
+					w->color = RED; // Case 2
+					x = x->parent; // Case 2
+					x->parent = z->parent->parent; // Case 2
+				}
+				else if (w->left->color == BLACK) // Case 3
+				{
+					w->right->color = BLACK; // Case 3
+					w->color = RED; // Case 3
+					left_rotate(w); // Case 3
+					w = x->parent->left; // Case 3
+				}
+				w->color = x->parent->color; // Case 4
+				x->parent->color = BLACK; // Case 4
+				w->left->color = BLACK; // Case 4
+				right_rotate(x->parent); // Case 4
+				//x = _root; // Case 4 ???
+				//left
+			}
+		}
+		x->color = BLACK;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 
 	void insert_fix(node *new_elem, node *parent)
 	{
@@ -448,10 +645,10 @@ class map
 			}
 			x = new_node(key, val);
 			x->parent = new_parent;
-			if (key < new_parent.key)
-				new_parent.left = x;
+			if (key < new_parent->key)
+				new_parent->left = x;
 			else
-				new_parent.right = x;
+				new_parent->right = x;
 			x->color = RED;
 			return (x);
 		}

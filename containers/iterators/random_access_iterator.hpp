@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/30 16:14:35 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/22 10:55:39 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/25 10:57:42 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define RANDOM_ACCESS_ITERATOR_HPP
 
 # include <cstddef>
+# include "./iterator_traits.hpp"
 
 namespace ft 
 {
@@ -27,6 +28,12 @@ namespace ft
 			typedef	T*							pointer;
 			typedef	T&							reference;
 			typedef random_access_iterator		iterator_category;
+
+			// typedef	typename ft::iterator_traits<T>::iterator_category	iterator_category;
+			// typedef	typename ft::iterator_traits<T>::value_type			value_type;
+			// typedef	typename ft::iterator_traits<T>::difference_type	difference_type;
+			// typedef	typename ft::iterator_traits<T>::pointer			pointer;
+			// typedef	typename ft::iterator_traits<T>::reference			reference;
 
 		private:	
 			
