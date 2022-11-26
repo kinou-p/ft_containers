@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 13:39:29 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/25 18:21:34 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/26 13:39:18 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ namespace ft
 		typedef T1	first_type;
 		typedef T2	second_type;
 		
-		T1 first;
-		T2 second;
+		first_type first;
+		second_type second;
 
 		pair(): first(), second() {}
 		pair( const T1& x, const T2& y ) : first(x), second(y) {}
@@ -28,12 +28,16 @@ namespace ft
 		template<class U1, class U2>
 		pair(const pair<U1, U2>& p): first(p.first), second(p.second) { }
 
-		pair& operator=(const pair& other)
-		{
-			first = other.first;
-			second = other.second;
+		pair& operator= (const pair& pr) {
+			if (this != &pr)
+			{
+				this->first = pr.first;
+				this->second = pr.second;
+			}
 			return (*this);
 		}
+
+		~pair() {}
 	};
 
 	template <class T1, class T2>
