@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 15:23:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/26 17:04:29 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/26 17:32:44 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "./iterators/bidirectionnal_iterator.hpp"
 #include "./iterators/pair.hpp"
 #include "./iterators/make_pair.hpp"
-#include "vector.hpp"
+
 
 #define RED 1
 #define BLACK 0
@@ -27,10 +27,9 @@ namespace ft
 {
 
 template<
-	class Key,
-	class T,
-	class Compare = std::less<Key>,
-	class Allocator = std::allocator<ft::pair<const Key, T> > >
+    class Key,
+    class Compare = std::less<Key>,
+    class Allocator = std::allocator<Key> >
 
 class set
 {
@@ -42,8 +41,7 @@ class set
 	struct	node;
 
 	typedef	Key													key_type;
-	typedef	T													mapped_type;
-	typedef	ft::pair<const Key, T>								value_type;
+	typedef	Key													value_type;
 	typedef	std::size_t											size_type;
 	typedef	std::ptrdiff_t										difference_type;
 	typedef	Compare												key_compare;
@@ -80,8 +78,8 @@ class set
 		bool		color;
 
 		//node() : parent(0), right(set::_end), left(set::_end), color(0) {}
-		node(key_type const &key, mapped_type const &val) 
-		: data(ft::make_pair(key, val)), parent(0), right(_end), left(_end), color(0)
+		node(key_type const &key) 
+		: data(key), parent(0), right(_end), left(_end), color(0)
 		{}
 			//std::cout << "end in construct= " << _end << std::endl;
 	};
@@ -201,51 +199,15 @@ class set
 	{
 		return (_alloc.max_size());
 	}
-	
 
-		//------------------------------
-		//--------Element access--------
-		//------------------------------
-	mapped_type& operator[] (const key_type& k)
-	{
-		iterator tmp = this->find(k);
-		//ft::pair<> new_pair = ft::make_pair(k, mapped_type());
-		value_type	new_pair = ft::make_pair(k, mapped_type());
-		
-		if (tmp.base() == _end)
-			return this->insert_node(new_pair.first, new_pair.second)->data.second; //??????
-		else
-			return ((*tmp).second);
-	}
-	
-	mapped_type& at (const key_type& k)
-	{
-		iterator tmp = this->find(k);
-		
-		if (tmp->m == _end)
-			throw (std::out_of_range("ft::set::at"));
-		else
-			return (*tmp.pair.second);
-	}
-	
-	const mapped_type& at (const key_type& k) const
-	{
-		iterator tmp = this->find(k);
-		
-		if (tmp->m == _end)
-			throw (std::out_of_range("ft::set::at"));
-		else
-			return (*tmp.pair.second);
-	}
-	
 		//-------------------------
 		//--------Modifiers--------
 		//-------------------------
-	ft::pair<iterator,bool> insert (const value_type& val)
+	ft::pair<iterator, bool> insert (const value_type& val)
 	{
 		// if (this->insert_node(val.first, val.second))
 		// 	_size++;
-		node *pt = new_node(val.first, val.second);
+		node *pt = new_node(val);
 		_root = insert_node(_root, pt);
 		fixViolation(_root, pt);
 	}	
@@ -255,7 +217,7 @@ class set
 		(void)position;
 		// if (this->insert_node(val.first, val.second))
 		// 	_size++;
-		node *pt = new_node(val.first, val.second);
+		node *pt = new_node(val);
 		_root = insert_node(_root, pt);
 		fixViolation(_root, pt);
 	}
@@ -263,14 +225,13 @@ class set
 	template <class InputIterator>
 	void insert (InputIterator first, InputIterator last)
 	{
-		int i = 0;
 		while (first != last)
 		{
 			// std::cout << "i === " << i++ << std::endl;
 			// if (this->insert_node(_root, new_node((*first).first, (*first).second)))
 			// 	_size++;
 			// first++;
-			node *pt = new_node((*first).first, (*first).second);
+			node *pt = new_node(*first);
 			_root = insert_node(_root, pt);
 			fixViolation(_root, pt);
 			first++;
@@ -388,7 +349,7 @@ class set
 	{
 		iterator it = begin(), ite = end();
 
-		while (it != ite && !(_comp((*it).first, k)))
+		while (it != ite && !(_comp((*it), k)))
 			it++;
 		return (it);
 	}
@@ -397,7 +358,7 @@ class set
 	{
 		const_iterator it = begin(), ite = end();
 
-		while (it != ite && !(_comp((*it).first, k)))
+		while (it != ite && !(_comp((*it), k)))
 			it++;
 		return (it);
 	}
@@ -406,7 +367,7 @@ class set
 	{
 		iterator it = begin(), ite = end();
 
-		while (it != ite && !(_comp((*it).first, k)))
+		while (it != ite && !(_comp((*it), k)))
 			it++;
 		return (it);
 	}
@@ -415,7 +376,7 @@ class set
 	{
 		const_iterator it = begin(), ite = end();
 
-		while (it != ite && _comp((*it).first, k))
+		while (it != ite && _comp((*it), k))
 			it++;
 		return (it);
 	}
@@ -777,15 +738,15 @@ class set
   }
 
 	//template<typename T_node>
-	node *new_node(key_type key, mapped_type val)
+	node *new_node(key_type key)
 	{
 		node *ret;
 
 		ret = _node_alloc.allocate(1);
-		_node_alloc.construct(ret, node(key, val));
+		_node_alloc.construct(ret, node(key));
 
 		//ret = _node_alloc::allocate(1);
-		//_node_alloc::construct(ret, node(key, val));
+		//_node_alloc::construct(ret, node(key));
 		return (ret);
 	}
 	
@@ -795,8 +756,8 @@ class set
 //----------COMPARE CLASS-----------
 //----------------------------------
 
-template <class Key, class T, class Compare, class Alloc>
-class set<Key,T,Compare,Alloc>::value_compare //man set::value_compare
+template <class Key, class Compare, class Alloc>
+class set<Key,Compare,Alloc>::value_compare //man set::value_compare
 {  // in C++98, it is required to inherit binary_function<value_type,value_type,bool>
 	friend class set;
 	protected:
@@ -808,7 +769,7 @@ class set<Key,T,Compare,Alloc>::value_compare //man set::value_compare
 		typedef value_type second_argument_type;
 		bool operator() (const value_type& x, const value_type& y) const
 		{
-			return comp(x.first, y.first);
+			return comp(x, y);
 		}
 };
 

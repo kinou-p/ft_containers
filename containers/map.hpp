@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 15:23:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/26 17:03:16 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/26 17:36:15 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ class map
 		node_allocator_type	_node_alloc;
 		
 		node				*_root;
-		//node				*_end;
 		size_type			_size;
 
 	public :
@@ -80,11 +79,9 @@ class map
 		node		*left;
 		bool		color;
 
-		//node() : parent(0), right(map::_end), left(map::_end), color(0) {}
 		node(key_type const &key, mapped_type const &val) 
 		: data(ft::make_pair(key, val)), parent(0), right(_end), left(_end), color(0)
 		{}
-			//std::cout << "end in construct= " << _end << std::endl;
 	};
 	//-----------------------------
 	//-----PRIVATE MEMBER TYPE-----
@@ -99,8 +96,6 @@ class map
 	
 	explicit map( const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : _comp(comp), _alloc(alloc), _root(_end)
 	{
-		//_end = _node_alloc.allocate(1);
-		//_node_alloc.construct(_end, node());
 		_size = 0;
 	}
 	
@@ -108,8 +103,6 @@ class map
 	map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ) : _comp(comp), _alloc(alloc), _root(_end) 
 	{
 		_size = 0;
-		//_end = _node_alloc.allocate(1);
-		//_node_alloc.construct(_end, node());
 		this->insert(first, last);	
 	}
 	
@@ -129,7 +122,6 @@ class map
 		_alloc = x._alloc;
 		_node_alloc = x._node_alloc;
 		_root = x._root;
-		//_end = x._end;
 		_size = x._size;
 		return (*this);
 	}
@@ -244,8 +236,6 @@ class map
 		//-------------------------
 	ft::pair<iterator,bool> insert (const value_type& val)
 	{
-		// if (this->insert_node(val.first, val.second))
-		// 	_size++;
 		node *pt = new_node(val.first, val.second);
 		_root = insert_node(_root, pt);
 		fixViolation(_root, pt);
@@ -254,8 +244,6 @@ class map
 	iterator insert (iterator position, const value_type& val)
 	{
 		(void)position;
-		// if (this->insert_node(val.first, val.second))
-		// 	_size++;
 		node *pt = new_node(val.first, val.second);
 		_root = insert_node(_root, pt);
 		fixViolation(_root, pt);
@@ -264,13 +252,8 @@ class map
 	template <class InputIterator>
 	void insert (InputIterator first, InputIterator last)
 	{
-		int i = 0;
 		while (first != last)
 		{
-			// std::cout << "i === " << i++ << std::endl;
-			// if (this->insert_node(_root, new_node((*first).first, (*first).second)))
-			// 	_size++;
-			// first++;
 			node *pt = new_node((*first).first, (*first).second);
 			_root = insert_node(_root, pt);
 			fixViolation(_root, pt);
@@ -306,14 +289,12 @@ class map
 		tmp->_alloc = _alloc;
 		tmp->_node_alloc = _node_alloc;
 		tmp->_root = _root;
-		//tmp->_end = _end;
 		tmp->_size = _size;
 
 		_comp = x->_comp;
 		_alloc = x->_alloc;
 		_node_alloc = x->_node_alloc;
 		_root = x->_root;
-		//_end = x->_end;
 		_size = x->_size;
 
 		x->_comp = tmp-> _comp;
