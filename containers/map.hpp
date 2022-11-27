@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   map.hpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/26 15:23:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/26 17:36:15 by apommier         ###   ########.fr       */
-/*                                                                            */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   map.hpp											:+:	  :+:	:+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: apommier <apommier@student.42.fr>		  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2022/11/26 15:23:32 by apommier		  #+#	#+#			 */
+/*   Updated: 2022/11/27 11:46:38 by apommier		 ###   ########.fr	   */
+/*																			*/
 /* ************************************************************************** */
 
 #pragma once
@@ -106,9 +106,12 @@ class map
 		this->insert(first, last);	
 	}
 	
-	map( const map& x)
+	map( const map& x) : _comp(x._comp), _alloc(x._alloc), _node_alloc(x._node_alloc)
 	{
-		*this = x;
+		_root = 0;
+		_size = 0;
+		insert(x.begin(), x.end());
+		//*this = x;
 	}
 	
 	~map()
@@ -121,8 +124,14 @@ class map
 		_comp = x._comp;
 		_alloc = x._alloc;
 		_node_alloc = x._node_alloc;
-		_root = x._root;
-		_size = x._size;
+		_root = 0;
+		_size = 0;
+		insert(x.begin(), x.end());
+		// _comp = x._comp;
+		// _alloc = x._alloc;
+		// _node_alloc = x._node_alloc;
+		// _root = x._root;
+		// _size = x._size;
 		return (*this);
 	}
 
@@ -135,12 +144,20 @@ class map
 		//-------------------------
 	iterator begin()
 	{
-		return iterator(_root, _root);
+		iterator it(_root, _root);
+		iterator ret(_root, it.minimum(_root));
+
+		//std::cout << "ret key: " << ret->first << " | value: " << ret->second << std::endl;
+		//ret++;
+		//std::cout << "ret key: " << ret->first << " | value: " << ret->second << std::endl;
+		//return iterator(_root, it.minimum(_root));
+		return ret;
 	}
 	
 	const_iterator begin() const
 	{
-		return const_iterator(_root, _root);
+		const_iterator it(_root, _root);
+		return const_iterator(_root, it.minimum(_root));
 	}
 	
 	iterator end()
@@ -202,11 +219,18 @@ class map
 	mapped_type& operator[] (const key_type& k)
 	{
 		iterator tmp = this->find(k);
+		node *pt;
 		//ft::pair<> new_pair = ft::make_pair(k, mapped_type());
-		value_type	new_pair = ft::make_pair(k, mapped_type());
-		
+		//value_type	new_pair = ft::make_pair(k, mapped_type());
+		//std::cout << "base== " << tmp.base() << std::endl;
 		if (tmp.base() == _end)
-			return this->insert_node(new_pair.first, new_pair.second)->data.second; //??????
+		{
+			pt = new_node(k, mapped_type());
+			_root = insert_node(_root, pt);
+			_size++;
+			return (pt->data.second);
+			//return (this->insert_node(_root, new_node(k, mapped_type()))->data.second); //??????
+		}
 		else
 			return ((*tmp).second);
 	}
@@ -239,6 +263,7 @@ class map
 		node *pt = new_node(val.first, val.second);
 		_root = insert_node(_root, pt);
 		fixViolation(_root, pt);
+		_size++;
 	}	
 	
 	iterator insert (iterator position, const value_type& val)
@@ -247,6 +272,7 @@ class map
 		node *pt = new_node(val.first, val.second);
 		_root = insert_node(_root, pt);
 		fixViolation(_root, pt);
+		_size++;
 	}
 	
 	template <class InputIterator>
@@ -258,26 +284,41 @@ class map
 			_root = insert_node(_root, pt);
 			fixViolation(_root, pt);
 			first++;
+			_size++;
 		}
 	}
 	
 	void erase (iterator position)
 	{
-		delete_node(position.base());
+		std::cout << "position"<< std::endl;
+		//std::cout << "key: " << position->first << " | value: " << position->second << std::endl;
+		//std::cout << "rrrrrkey: " << _root->data.first << " | rrrrvalue: " << _root->data.second << std::endl;
+		deleteNode(position.base());
+		_size--;
 	}
 	
 	size_type erase (const key_type& k)
 	{
-		delete_node(find(k).base());
-		return(1);
+		std::cout << "key== "<< k << std::endl;
+		iterator test = find(k);
+		//std::cout << "test-base= " << test.base() << std::endl;
+		if (test.base())
+		{
+			deleteNode(test.base());
+			_size--;
+			return(1);
+		}
+		return (0);
 	}
 	
 	void erase (iterator first, iterator last)
 	{
-		while (first != last)
+		std::cout << "range"<< std::endl;
+		while (last != first)
 		{
-			delete_node(first.base());
-			first++;
+			last--;
+			_size--;
+			deleteNode(last.base());
 		}
 	}
 	
@@ -305,9 +346,48 @@ class map
 		x->_size = tmp->_size;
 	}
 	
+void printPair(iterator iterator)
+{
+	std::cout << "key: " << iterator->first << " | value: " << iterator->second << std::endl;
+}
+
+void	printReverse()
+{
+	std::cout << "_________________________in map print______________________" << std::endl;
+	iterator it = this->end(), ite = this->begin();
+	while (it != ite)
+	{
+		it--;
+		printPair(it);
+	}
+	std::cout << "_______________________________________________" << std::endl;
+}
+
 	void clear()
 	{
-		
+		//iterator it = this->begin();
+		//iterator ite = this->end();
+
+		//erase(this->begin(), this->end());
+		// printReverse();
+		// while (it != ite)
+		// {
+		// 	std::cout << "saesfawf= " << std::endl;
+		// 	deleteNode(it.base());
+		// 	printReverse();
+		// 	it++;
+		// 	std::cout << "size= " << _size << std::endl;
+		// 	_size--;
+		// }
+		// // _size = 0;
+		// _root = 0;
+		while (_size)
+		{
+			//printReverse();
+			deleteNode(_root);
+			_size--;
+		}
+		_root = 0;
 	}
 	
 		//-------------------------
@@ -329,35 +409,92 @@ class map
 		//-------Operations--------
 		//------------------------- 
 
-	iterator find (const key_type& k)
+	iterator find(const key_type& k)
 	{
-		node *x = _root;
-		int i = 0;
-		while (x != _end && x->data.first != k)
+		node *temp = _root;
+		while (temp != NULL)
 		{
-			std::cout << "i === " << i << std::endl;
-			if (k > x->data.first)
-				x = x->left;
+    		if (k < temp->data.first)
+			{
+				//if (temp->left == NULL)
+        		//	break;
+    			//else
+        			temp = temp->left;
+    		}
+			else if (k == temp->data.first)
+        		break;
 			else
-				x = x->right;
-			i++;
-		}
-		return (iterator(_root, _end, x));
+			{
+        		//if (temp->right == NULL)
+          		//	break;
+        		//else
+        			temp = temp->right;
+    		}
+    	}
+ 		return iterator(_root, temp);
 	}
-	
-	const_iterator find (const key_type& k) const
+
+	const_iterator find(const key_type& k) const
 	{
-		node *x = _root;
+		node *temp = _root;
+		while (temp != NULL)
+		{
+    		if (k < temp->data.first)
+			{
+				if (temp->left == NULL)
+        			break;
+    			else
+        			temp = temp->left;
+    		}
+			else if (k == temp->data.first)
+        		break;
+			else
+			{
+        		if (temp->right == NULL)
+          			break;
+        		else
+        			temp = temp->right;
+    		}
+    	}
+ 		return const_iterator(_root, temp);
+	}
+
+	// iterator find (const key_type& k)
+	// {
+	// 	node *x = _root;
 		
-		while (x != _end && x->data.first != k)
-		{
-			if (k > x->data.first)
-				x = x->left;
-			else
-				x = x->right;
-		}
-		return (iterator(_root, _end, x));
-	}
+	// 	std::cout << "=============k=========== " << k << std::endl;
+	// 	while (x != _end && x->data.first != k)
+	// 	{
+	// 		std::cout << "x data first " << x->data.first << std::endl;
+	// 		std::cout << "x data right " << x->right->data.first << std::endl;
+	// 		std::cout << "x data left " << x->left->data.first << std::endl;
+	// 		if (k > x->data.first)
+	// 			x = x->left;
+	// 		else
+	// 			x = x->right;
+	// 	}
+	// 	std::cout << "============x============= " << x << std::endl;
+	// 	if (x != 0)
+	// 		std::cout << "x data first " << x->data.first << std::endl;
+	// 	return (iterator(_root, x));
+	// }
+	
+	// const_iterator find (const key_type& k) const
+	// {
+	// 	node *x = _root;
+		
+	// 	std::cout << "=============k=========== " << k << std::endl;
+	// 	while (x != _end && x->data.first != k)
+	// 	{
+	// 		if (k > x->data.first)
+	// 			x = x->left;
+	// 		else
+	// 			x = x->right;
+	// 	}
+	// 	std::cout << "============x============= " << x << std::endl;
+	// 	return (iterator(_root, x));
+	// }
 	
 	size_type count (const key_type& k) const
 	{
@@ -370,8 +507,12 @@ class map
 	{
 		iterator it = begin(), ite = end();
 
-		while (it != ite && !(_comp((*it).first, k)))
+		while (it != ite)
+		{
+			if (_comp((*it).first, k) == false)
+				return (it);
 			it++;
+		}
 		return (it);
 	}
 	
@@ -379,8 +520,12 @@ class map
 	{
 		const_iterator it = begin(), ite = end();
 
-		while (it != ite && !(_comp((*it).first, k)))
+		while (it != ite)
+		{
+			if (_comp((*it).first, k) == false)
+				return (it);
 			it++;
+		}
 		return (it);
 	}
 	
@@ -388,8 +533,12 @@ class map
 	{
 		iterator it = begin(), ite = end();
 
-		while (it != ite && !(_comp((*it).first, k)))
+		while (it != ite)
+		{
+			if (_comp(k, (*it).first))
+				return (it);
 			it++;
+		}
 		return (it);
 	}
 	
@@ -397,8 +546,12 @@ class map
 	{
 		const_iterator it = begin(), ite = end();
 
-		while (it != ite && _comp((*it).first, k))
+		while (it != ite)
+		{
+			if (_comp(k, (*it).first))
+				return (it);
 			it++;
+		}
 		return (it);
 	}
 	
@@ -422,7 +575,7 @@ class map
 
 	private :
 
-	void rotateLeft(node *&root, node *&pt)
+	void rotateLeft(node *&pt)
 	{
 		node *pt_right = pt->right;
 		pt->right = pt_right->left;
@@ -430,7 +583,7 @@ class map
 			pt->right->parent = pt;
 		pt_right->parent = pt->parent;
 		if (pt->parent == NULL)
-			root = pt_right;
+			_root = pt_right;
 		else if (pt == pt->parent->left)
 			pt->parent->left = pt_right;
 		else
@@ -440,7 +593,7 @@ class map
 	}
 	
 	
-	void rotateRight(node *&root, node *&pt)
+	void rotateRight(node *&pt)
 	{
 	
 		node *pt_left = pt->left;
@@ -449,7 +602,7 @@ class map
 			pt->left->parent = pt;
 		pt_left->parent = pt->parent;
 		if (pt->parent == NULL)
-			root = pt_left;
+			_root = pt_left;
 		else if (pt == pt->parent->left)
 			pt->parent->left = pt_left;
 		else
@@ -462,7 +615,12 @@ class map
 	{
 		/* If the tree is empty, return a new node */
 		if (root == NULL)
-		   return pt;	 
+		   return pt;
+		else if (pt->data.first == root->data.first)
+		{
+			_size--;
+			return root;
+		}
 		/* Otherwise, recur down the tree */
 		if (pt->data < root->data)
 		{
@@ -503,12 +661,12 @@ class map
 					/* Case : 2 pt is right child of its parent Left-rotation required */
 					if (pt == parent_pt->right)
 					{
-						rotateLeft(root, parent_pt);
+						rotateLeft(parent_pt);
 						pt = parent_pt;
 						parent_pt = pt->parent;
 					}
 	 				/* Case : 3 pt is left child of its parent Right-rotation required */
-					rotateRight(root, grand_parent_pt);
+					rotateRight(grand_parent_pt);
 					swapColors(parent_pt, grand_parent_pt);
 					pt = parent_pt;
 				}
@@ -530,12 +688,12 @@ class map
 					/* Case : 2 | pt is left child of its parent | Right-rotation required */
 					if (pt == parent_pt->left)
 					{
-						rotateRight(root, parent_pt);
+						rotateRight(parent_pt);
 						pt = parent_pt;
 						parent_pt = pt->parent;
 					}
 					/* Case : 3 pt is right child of its parent Left-rotation required */
-					rotateLeft(root, grand_parent_pt);
+					rotateLeft(grand_parent_pt);
 					swapColors(parent_pt, grand_parent_pt);
 					pt = parent_pt;
 				}
@@ -551,23 +709,30 @@ class map
 
 	node *uncle(node *x)
 	{
-		if (x->parent == NULL or x->parent->parent == NULL)
+		if (x->parent == NULL || x->parent->parent == NULL)
 			return NULL;
-		if (x->parent->isOnLeft())
+		if (isOnLeft(x->parent))
 			return x->parent->parent->right;
 		else
 			return x->parent->parent->left;
 	}
 
-	bool isOnLeft(node *x) { return this == x->parent->left; }
+	bool isOnLeft(node *x)
+	{
+		if (!x->parent)
+			return(false);
+		return x == x->parent->left;
+	}
  
 	// returns pointer to sibling
 	node *sibling(node *x)
 	{
 		// sibling null if no parent
+		if (!x)
+			return NULL;
 		if (x->parent == NULL)
 			return NULL;
-		if (isOnLeft())
+		if (isOnLeft(x))
 			return x->parent->right;
 		return x->parent->left;
 	}
@@ -577,7 +742,7 @@ class map
 	{
 		if (x->parent != NULL)
 		{
-			if (isOnLeft())
+			if (isOnLeft(x))
 				x->parent->left = nParent;
 		else
 			x->parent->right = nParent;
@@ -588,7 +753,7 @@ class map
 
 	bool hasRedChild(node *x)
 	{
-		return (x->left != NULL and x->left->color == RED) or (x->right != NULL and x->right->color == RED);
+		return (x->left != NULL && x->left->color == RED) || (x->right != NULL && x->right->color == RED);
 	}
  
 	void swapColors(node *x1, node *x2)
@@ -599,12 +764,139 @@ class map
 		x2->color = temp;
 	}
  
-	void swapValues(node *u, node *v)
+	void swapValues(node **u, node **v)
 	{
-		int temp;
-		temp = u->val;
-		u->val = v->val;
-		v->val = temp;
+		//std::cout << "-------------------swap value-------------------\n";
+		
+		//node *test = (*u)->parent;
+		//node *test2 = (*v)->parent;
+
+		node *tmp = new_node((*u)->data.first, (*u)->data.second);
+		node *tmp2 = new_node((*v)->data.first, (*v)->data.second);
+
+		tmp->parent = (*v)->parent;
+		tmp->right = (*v)->right;
+		tmp->left = (*v)->left;
+		tmp2->parent = (*u)->parent;
+		tmp2->right = (*u)->right;
+		tmp2->left = (*u)->left;
+
+		if (isOnLeft(*u))
+			(*u)->parent->left = tmp2;
+		else if ((*u)->parent)
+			(*u)->parent->right = tmp2;
+
+		if (isOnLeft(*v))
+			(*v)->parent->left = tmp;
+		else if ((*v)->parent)
+			(*v)->parent->right = tmp;
+
+		if ((*v)->right)
+			(*v)->right->parent = tmp;
+		if ((*v)->left)
+			(*v)->left->parent = tmp;
+
+		if ((*u)->right)
+			(*u)->right->parent = tmp2;
+		if ((*u)->left)
+			(*u)->left->parent = tmp2;
+
+		//destruct_node(*u);
+		//destruct_node(*v);
+		*v = tmp;
+		*u = tmp2;
+		//destruct_node(v);
+		//return (tmp);
+
+		//std::cout << "test= " << test->right << std::endl;
+		//std::cout << "test= " << test2->right << std::endl;
+	}
+ 
+	void fixDoubleBlack(node *x)
+	{
+		//std::cout << "x= " << x << std::endl;
+		if (x == _root)
+			return;
+		// Reached root
+
+		node *sibling = this->sibling(x), *parent = x->parent;
+		if (sibling == NULL)
+		{
+			// No sibling, double black pushed up
+			fixDoubleBlack(parent);
+		}
+		else
+		{
+			if (sibling->color == RED)
+			{
+				// Sibling red
+				parent->color = RED;
+				sibling->color = BLACK;
+				if (isOnLeft(sibling))
+				{
+					// left case
+					this->rotateRight(parent);
+				}
+				else
+				{
+					// right case
+					rotateLeft(parent);
+				}
+				fixDoubleBlack(x);
+	  		}
+			else
+			{
+				// Sibling black
+				if (hasRedChild(sibling))
+				{
+					// at least 1 red children
+					if (sibling->left != NULL && sibling->left->color == RED)
+					{
+						if (isOnLeft(sibling))
+						{
+							// left left
+							sibling->left->color = sibling->color;
+							sibling->color = parent->color;
+							rotateRight(parent);
+						}
+						else
+						{
+							// right left
+							sibling->left->color = parent->color;
+							rotateRight(sibling);
+							rotateLeft(parent);
+						}
+					}
+					else
+					{
+						if (isOnLeft(sibling))
+						{
+							// left right
+							sibling->right->color = parent->color;
+							rotateLeft(sibling);
+							rotateRight(parent);
+						}
+						else
+						{
+							// right right
+							sibling->right->color = sibling->color;
+							sibling->color = parent->color;
+							rotateLeft(parent);
+						}
+					}
+					parent->color = BLACK;
+				}
+				else
+				{
+					// 2 black children
+					sibling->color = RED;
+					if (parent->color == BLACK)
+						fixDoubleBlack(parent);
+					else
+						parent->color = BLACK;
+				}
+			}
+		}
 	}
  
 	void fixRedRed(node *x)
@@ -640,24 +932,24 @@ class map
 			  		}
 					else
 					{
-						leftRotate(parent);
+						rotateLeft(parent);
 						swapColors(x, grandparent);
 					}
 			 		// for left left and left right
-			  		rightRotate(grandparent);
+			  		rotateRight(grandparent);
 				}
 				else
 				{
 					if (x->isOnLeft())
 					{
 						// for right left
-						rightRotate(parent);
+						rotateRight(parent);
 						swapColors(x, grandparent);
 					}
 					else
 						swapColors(parent, grandparent);
 				// for right right and right left
-				leftRotate(grandparent);
+				rotateLeft(grandparent);
 			}
 		  }
 		}
@@ -678,10 +970,10 @@ class map
 	node *replace_node(node *x)
 	{
 		// when node have 2 children
-		if (x->left != NULL and x->right != NULL)
+		if (x->left != NULL && x->right != NULL)
 			return successor(x->right);
 		// when leaf
-		if (x->left == NULL and x->right == NULL)
+		if (x->left == NULL && x->right == NULL)
 			return NULL;
 		// when single child
 		if (x->left != NULL)
@@ -695,8 +987,9 @@ class map
 	{
 		node *u = replace_node(v);
 
+		//std::cout << "root key=  " << _root->data.first << std::endl;
 		// True when u and v are both black
-		bool uvBlack = ((u == NULL or u->color == BLACK) and (v->color == BLACK));
+		bool uvBlack = ((u == NULL || u->color == BLACK) && (v->color == BLACK));
 		node *parent = v->parent;
 		if (u == NULL)
 		{
@@ -714,48 +1007,177 @@ class map
 				else
 				{
 					// u or v is red
-					if (v->sibling() != NULL)
+					if (sibling(v) != NULL)
 					// sibling is not null, make it red"
-					v->sibling()->color = RED;
+					sibling(v)->color = RED;
 				}
 				// delete v from the tree
-				if (v->isOnLeft())
+				if (isOnLeft(v))
 					parent->left = NULL;
 				else
 					parent->right = NULL;
 			}
-			delete v;
+			destruct_node(v);
 			return;
 		}
-	if (v->left == NULL or v->right == NULL)
-	{
-		// v has 1 child
-		if (v == _root)
+		if (v->left == NULL || v->right == NULL)
 		{
-			// v is root, assign the value of u to v, and delete u
-			v->val = u->val;
-			v->left = v->right = NULL;
-			delete u;
+			// v has 1 child
+			if (v == _root)
+			{
+				// v is root, assign the value of u to v, and delete u
+
+				//swapValues(&u, &v);
+    			//deleteNode(u);
+
+
+
+
+				node *tmp4 = new_node(u->data.first, u->data.second);
+				tmp4->parent = v->parent;
+				tmp4->right = v->right;
+				tmp4->left = v->left;
+				_root = tmp4;
+
+				if (v->right)
+					v->right->parent = tmp4;
+				if (v->left)
+					v->left->parent = tmp4;
+				
+				// deleteNode(u);
+				// node *tmp5 = new_node(v->data.first, v->data.second);
+				// tmp5->parent = u->parent;
+				// tmp5->right = u->right;
+				// tmp5->left = u->left;
+				// if (isOnLeft(u))
+				// 	u->parent->left = tmp5;
+				// else if (u->parent)
+				// 	u->parent->right = tmp5;
+
+				// destruct_node(u);
+				// destruct_node(v);
+				//deleteNode(tmp5);
+
+
+				// u->parent->left = 0;
+				// u->parent = 0;
+				// u = _root;
+
+				// v->data = u->data;
+				// v->left = v->right = NULL;
+				// destruct_node(u);
+				
+				//node *tmp = new_node((u)->data.first, (u)->data.second);
+
+
+
+
+
+				//swapValues(&u, &v);
+	
+				// if (isOnLeft(u))
+				// 	u->parent->left = 0;
+				// else
+				// 	u->parent->right = 0;
+
+				// std::cout << "root key: " << _root->data.first << " | root value: " << _root->data.second << std::endl;	
+				// std::cout << "key: " << u->data.first << " | value: " << u->data.second << std::endl;	
+				// // node *tmp = new_node((u)->data.first, (u)->data.second);
+				// // tmp->right = v->right;
+				// // tmp->left = v->left;
+				// u->parent = 0;
+				// //u->right = v->right;
+				// u->left = v->left;
+
+				// //if (u->right)
+				// //	u->right->parent = u;
+				// //if (u->right)
+				// //	u->left->parent = u;
+
+				// _root = u;
+				// _root->color = BLACK;
+				// destruct_node(v);
+
+				// std::cout << "root key: " << _root->data.first << " | root value: " << _root->data.second << std::endl;	
+				// std::cout << "here2\n";
+				// std::cout << "here2\n";
+				// std::cout << "here2\n";
+				// std::cout << "here2\n";
+				//_root = u;
+				//u->right = v->right;
+				//u->left = v->left;
+				//v->left = v->right = NULL;
+				
+				//destruct_node(u);
+			}
+			else
+			{
+				// Detach v from tree and move u up
+				if (isOnLeft(v))
+					parent->left = u;
+				else
+					parent->right = u;
+				destruct_node(v);
+				u->parent = parent;
+				if (uvBlack)
+					fixDoubleBlack(u);// u and v both black, fix double black at u
+				else
+					u->color = BLACK;// u or v red, color u black
+			}
+			return;
 		}
+		// v has 2 children, swap values with successor and recurse
+		//swapValues(&u, &v);
+		
+			// node *tmp8 = new_node(u->data.first, u->data.second);
+			// tmp8->parent = v->parent;
+			// tmp8->right = v->right;
+			// tmp8->left = v->left;
+			// //_root = tmp8;
+
+			// if (v->right)
+			// 	v->right->parent = tmp8;
+			// if (v->left)
+			// 	v->left->parent = tmp8;
+
+
+
+			// deleteNode(u);
+
+		// std::cout << "here\n";
+		// std::cout << "here\n";
+		// std::cout << "here\n";
+		// std::cout << "here\n";
+		// std::cout << "here\n";
+		std::cout << "here\n";
+		std::cout << "here\n";
+
+		node *tmp2 = new_node(u->data.first, u->data.second);
+		tmp2->parent = v->parent;
+		tmp2->right = v->right;
+		tmp2->left = v->left;
+		if (isOnLeft(v))
+			v->parent->left = tmp2;
+		else if (v->parent)
+			v->parent->right = tmp2;
 		else
-		{
-			// Detach v from tree and move u up
-			if (v->isOnLeft())
-				parent->left = u;
-			else
-				parent->right = u;
-			delete v;
-			u->parent = parent;
-			if (uvBlack)
-				fixDoubleBlack(u);// u and v both black, fix double black at u
-			else
-				u->color = BLACK;// u or v red, color u black
-		}
-		return;
-	}
-	// v has 2 children, swap values with successor and recurse
-	swapValues(u, v);
-	deleteNode(u);
+			_root = tmp2; 
+		
+		node *tmp3 = new_node(v->data.first, v->data.second);
+		tmp3->parent = u->parent;
+		tmp3->right = u->right;
+		tmp3->left = u->left;
+		if (isOnLeft(u))
+			u->parent->left = tmp3;
+		else if (u->parent)
+			u->parent->right = tmp3;
+		
+		destruct_node(u);
+		destruct_node(v);
+		deleteNode(tmp3);
+		
+		
+		//deleteNode(u);
   }
 
 	//template<typename T_node>
@@ -769,6 +1191,16 @@ class map
 		//ret = _node_alloc::allocate(1);
 		//_node_alloc::construct(ret, node(key, val));
 		return (ret);
+	}
+
+	void destruct_node(node *x)
+	{
+		// if (isOnLeft(x))
+		// 	x->parent->left = _end;
+		// else if (x->parent)
+		// 	x->parent->right = _end;
+		_node_alloc.destroy(x);
+		_node_alloc.deallocate(x, 1);
 	}
 	
 }; //end of map class

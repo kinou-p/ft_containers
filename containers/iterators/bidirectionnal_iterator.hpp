@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 14:50:53 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/26 16:26:57 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/27 16:57:48 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class bidirectionnal_iterator
 
 	public :
 
-		bidirectionnal_iterator() : _node(NULL) {}
+		bidirectionnal_iterator() : _root(NULL), _node(NULL) {}
 		bidirectionnal_iterator(node_type *root, node_type *node) : _root(root), _node(node) {}
 		bidirectionnal_iterator(bidirectionnal_iterator const &rhs) { *this = rhs; }
 
@@ -62,8 +62,35 @@ class bidirectionnal_iterator
 
 		node_type	*base() { return (_node); }
 
-		friend bool operator==(const bidirectionnal_iterator &rhs, const bidirectionnal_iterator &lhs) { return (lhs._node == rhs._node); }
-		friend bool operator!=(const bidirectionnal_iterator &rhs, const bidirectionnal_iterator &lhs) { return (lhs._node != rhs._node); }
+		friend bool operator==(const bidirectionnal_iterator &rhs, const bidirectionnal_iterator &lhs)
+		{
+			if (!lhs._node && !rhs._node)
+			 	return (true);
+			else if (!lhs._node || !rhs._node)
+			 	return (false);
+			return (lhs._node->data == rhs._node->data);
+			// if (lhs._node && rhs._node)
+			// 	return (lhs._node->data == rhs._node->data);
+			// if (!lhs._node && !rhs._node)
+			// 	return (true);
+			// else
+			// 	return (false);
+		}
+		
+		friend bool operator!=(const bidirectionnal_iterator &rhs, const bidirectionnal_iterator &lhs)
+		{
+			if (!lhs._node && !rhs._node)
+			 	return (false);
+			else if (!lhs._node || !rhs._node)
+			 	return (true);
+			return (lhs._node->data != rhs._node->data);
+			// if (lhs._node && rhs._node)
+			// 	return (lhs._node->data != rhs._node->data);
+			// if (!lhs._node && !rhs._node)
+			// 	return (true);
+			// else
+			// 	return (false);
+		}
 		
 		reference operator*() { return (_node->data); }
 		const_reference	operator*() const { return (_node->data); }
@@ -96,25 +123,25 @@ class bidirectionnal_iterator
 		bidirectionnal_iterator operator --(int)
 		{
 			bidirectionnal_iterator tmp(*this);
-			++(*this);
+			--(*this);
 			return (tmp);
 		}
-	
-	private :
 
 		node_type *maximum(node_type *ptr)
 		{
-			while (ptr->right != _end)
+			while (ptr && ptr->right != _end)
 				ptr = ptr->right;
 			return (ptr);
 		}
 		
 		node_type *minimum(node_type *ptr)
 		{
-			while (ptr->left != _end)
+			while (ptr && ptr->left != _end)
 				ptr = ptr->left;
 			return (ptr);
 		}
+		
+	private :
 
 		node_type *predecessor(node_type *x)
 		{
@@ -133,6 +160,10 @@ class bidirectionnal_iterator
 		
 		node_type *successor(node_type *x)
 		{
+			if (!x)
+				return (0);
+			//std::cout << "_node: " << this->base() << std::endl;
+			//std::cout << "succkey: " << x->data.first << " | succvalue: " << x->data.second << std::endl;	
 			if (x->right != _end)
 				return minimum(x->right);
 			node_type *y = x->parent;
