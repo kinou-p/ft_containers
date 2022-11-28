@@ -291,10 +291,14 @@ class map
 		//-------------------------
 	ft::pair<iterator,bool> insert (const value_type& val)
 	{
+		iterator find = this->find(val.first);
+		if (find.base() != _end)
+			return (ft::make_pair(find, false));
 		NodePtr pt = new_node(val.first, val.second);
 		insert(pt);
 		//fixViolation(_root, pt);
 		_size++;
+		return (ft::make_pair(iterator(_root, _end, pt), true));
 	}	
 	
 	iterator insert (iterator position, const value_type& val)
@@ -304,6 +308,7 @@ class map
 		insert(pt);
 		//fixViolation(_root, pt);
 		_size++;
+		return (iterator(_root, _end, pt));
 	}
 	
 	template <class InputIterator>
@@ -855,8 +860,13 @@ class map
 		y = x;
 		if (node->data.first < x->data.first)
 			x = x->left;
-		else
+		else if (node->data.first > x->data.first)
 			x = x->right;
+		else
+		{
+			_size--;
+			return ;
+		}
 	}
 
 	node->parent = y;
