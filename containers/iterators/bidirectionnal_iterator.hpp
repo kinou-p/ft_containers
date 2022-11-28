@@ -1,18 +1,18 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   bidirectionnal_iterator.hpp                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/22 14:50:53 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/27 16:57:48 by apommier         ###   ########.fr       */
-/*                                                                            */
+/*																			*/
+/*														:::		::::::::	 */
+/*	 bidirectionnal_iterator.hpp						:+:		:+:	:+:	 */
+/*													+:+ +:+		 +:+	 */
+/*	 By: apommier <apommier@student.42.fr>			+#+	+:+		 +#+		*/
+/*												+#+#+#+#+#+	 +#+			 */
+/*	 Created: 2022/11/22 14:50:53 by apommier			#+#	#+#			 */
+/*	 Updated: 2022/11/27 21:22:24 by apommier		 ###	 ########.fr		 */
+/*																			*/
 /* ************************************************************************** */
 
 #pragma once
 
-#define _end 0
+//#define _end 0
 
 namespace ft
 {
@@ -29,17 +29,19 @@ class bidirectionnal_iterator
 		typedef	T&							reference;
 		typedef	const T&					const_reference;
 		typedef bidirectionnal_iterator		iterator_category;
-		typedef Node						node_type;
+		typedef Node						node;
+		typedef Node*						NodePtr;
 		
 	private :
 		
-		node_type *_root;
-		node_type *_node;
+		NodePtr _root;
+		NodePtr _end; 
+		NodePtr _node;
 
 	public :
 
-		bidirectionnal_iterator() : _root(NULL), _node(NULL) {}
-		bidirectionnal_iterator(node_type *root, node_type *node) : _root(root), _node(node) {}
+		bidirectionnal_iterator() : _root(NULL), _end(NULL), _node(NULL) {}
+		bidirectionnal_iterator(NodePtr root, NodePtr end, NodePtr node) : _root(root), _end(end), _node(node) { /*_end = NULL*/ }
 		bidirectionnal_iterator(bidirectionnal_iterator const &rhs) { *this = rhs; }
 
 		~bidirectionnal_iterator() {}
@@ -49,7 +51,7 @@ class bidirectionnal_iterator
 			if (this != &rhs) 
 			{
 				this->_root = rhs._root;
-				//this->_end = rhs._end;
+				this->_end = rhs._end;
 				this->_node = rhs._node;
 			}
 			return (*this);
@@ -57,10 +59,10 @@ class bidirectionnal_iterator
 		
 		operator bidirectionnal_iterator<const T, const Node>() const
 		{
-		 	return (bidirectionnal_iterator<const T, const Node>(_root, _node));
+		 	return (bidirectionnal_iterator<const T, const Node>(_root, _end, _node));
 		}
 
-		node_type	*base() { return (_node); }
+		NodePtr base() { return (_node); }
 
 		friend bool operator==(const bidirectionnal_iterator &rhs, const bidirectionnal_iterator &lhs)
 		{
@@ -97,85 +99,231 @@ class bidirectionnal_iterator
 		pointer operator->() { return (&(_node->data)); }
 		const_pointer operator->() const { return (&(_node->data)); }
 		
-		bidirectionnal_iterator &operator ++()
-		{
-			if (_node != NULL)
-				_node = successor(_node);
-			return (*this);
-		}
-		
-		bidirectionnal_iterator operator ++(int)
-		{
-			bidirectionnal_iterator tmp(*this);
-			++(*this);
-			return (tmp);
-		}
-		
-		bidirectionnal_iterator &operator --()
-		{
-			if (_node == _end)
-				_node = maximum(_root);
-			else
-				_node = predecessor(_node);
-			return (*this);
-		}
-		
-		bidirectionnal_iterator operator --(int)
-		{
-			bidirectionnal_iterator tmp(*this);
-			--(*this);
-			return (tmp);
-		}
 
-		node_type *maximum(node_type *ptr)
-		{
-			while (ptr && ptr->right != _end)
-				ptr = ptr->right;
-			return (ptr);
-		}
+
+			bidirectionnal_iterator &operator++() {
+				//std::cout << "end == "<< _end << std::endl;
+				//std::cout << "node == "<< _node << std::endl; 
+				if (_node != _end)
+					_node = successor(_node);
+				return (*this);
+			}
+
+			bidirectionnal_iterator operator++(int) {
+				bidirectionnal_iterator tmp(*this);
+				operator++();
+				return (tmp);
+			}
+
+			bidirectionnal_iterator &operator--() {
+				if (_node == _end) {
+					_node = maximum(_root);
+				}
+				else
+					_node = predecessor(_node);
+				return (*this);
+			}
+
+			bidirectionnal_iterator operator--(int) {
+				bidirectionnal_iterator tmp(*this);
+				operator--();
+				return (tmp);
+			}
+
+
+			NodePtr maximum(NodePtr ptr) {
+				while (ptr->right != _end)
+					ptr = ptr->right;
+				return (ptr);
+			}
+
+			NodePtr minimum(NodePtr ptr) {
+				while (ptr->left != _end)
+					ptr = ptr->left;
+				return (ptr);
+			}
+
+			NodePtr predecessor(NodePtr x) {
+				if (x->left != _end)
+				{
+					return maximum(x->left);
+				}
+				NodePtr y = x->parent;
+				while (y != NULL && x == y->left)
+				{
+					x = y;
+					y = y->parent;
+				}
+				return y;
+			}
+
+			NodePtr successor(NodePtr x) {
+				if (x->right != _end)
+					return minimum(x->right);
+				NodePtr y = x->parent;
+				while (y != NULL && x == y->right)
+				{
+					x = y;
+					y = y->parent;
+				}
+				if (y == NULL)
+					return _end;
+				return y;
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		// bidirectionnal_iterator &operator ++()
+		// {
+		// 	if (_node != NULL)
+		// 		_node = successor(_node);
+		// 	return (*this);
+		// }
 		
-		node_type *minimum(node_type *ptr)
-		{
-			while (ptr && ptr->left != _end)
-				ptr = ptr->left;
-			return (ptr);
-		}
+		// bidirectionnal_iterator operator ++(int)
+		// {
+		// 	bidirectionnal_iterator tmp(*this);
+		// 	++(*this);
+		// 	return (tmp);
+		// }
 		
+		// bidirectionnal_iterator &operator --()
+		// {
+		// 	if (_node == _end)
+		// 		_node = maximum(_root);
+		// 	else
+		// 		_node = predecessor(_node);
+		// 	return (*this);
+		// }
+		
+		// bidirectionnal_iterator operator --(int)
+		// {
+		// 	bidirectionnal_iterator tmp(*this);
+		// 	--(*this);
+		// 	return (tmp);
+		// }
+
+		// NodePtr maximum(NodePtr ptr)
+		// {
+		// 	while (ptr && ptr->right != _end)
+		// 		ptr = ptr->right;
+		// 	return (ptr);
+		// }
+		
+		// NodePtr minimum(NodePtr ptr)
+		// {
+		// 	while (ptr && ptr->left != _end)
+		// 		ptr = ptr->left;
+		// 	return (ptr);
+		// }
+		// NodePtr minimum(NodePtr node)
+		// {
+		// 	if (!node)
+		// 		return NULL;
+		// 	while (node->left->parent != NULL)
+		// 		node = node->left;
+		// 	return node;
+		// }
+	
+		// NodePtr maximum(NodePtr node)
+		// {
+		// 	if (!node)
+		// 		return NULL;
+		// 	while (node->right->parent != NULL)
+		// 		node = node->right;
+		// 	return node;
+		// }
+
 	private :
 
-		node_type *predecessor(node_type *x)
-		{
-			if (x->left != _end)
-			{
-				return maximum(x->left);
-			}
-			node_type *y = x->parent;
-			while (y != NULL && x == y->left)
-			{
-				x = y;
-				y = y->parent;
-			}
-			return y;
-		}
+		// NodePtr predecessor(NodePtr x)
+		// {
+		// 	if (x->left != _end)
+		// 	{
+		// 		return maximum(x->left);
+		// 	}
+		// 	NodePtr y = x->parent;
+		// 	while (y != NULL && x == y->left)
+		// 	{
+		// 		x = y;
+		// 		y = y->parent;
+		// 	}
+		// 	return y;
+		// }
 		
-		node_type *successor(node_type *x)
-		{
-			if (!x)
-				return (0);
-			//std::cout << "_node: " << this->base() << std::endl;
-			//std::cout << "succkey: " << x->data.first << " | succvalue: " << x->data.second << std::endl;	
-			if (x->right != _end)
-				return minimum(x->right);
-			node_type *y = x->parent;
-			while (y != NULL && x == y->right)
-			{
-				x = y;
-				y = y->parent;
-			}
-			if (y == NULL)
-				return _end;
-			return y;
-		}
+		// NodePtr successor(NodePtr x)
+		// {
+		// 	if (!x)
+		// 		return (0);
+		// 	//std::cout << "_node: " << this->base() << std::endl;
+		// 	//std::cout << "succkey: " << x->data.first << " | succvalue: " << x->data.second << std::endl;	
+		// 	if (x->right != _end)
+		// 		return minimum(x->right);
+		// 	NodePtr y = x->parent;
+		// 	while (y != NULL && x == y->right)
+		// 	{
+		// 		x = y;
+		// 		y = y->parent;
+		// 	}
+		// 	if (y == NULL)
+		// 		return _end;
+		// 	return y;
+		// }
+
+
+
+		// NodePtr successor(NodePtr x) {
+		// if (x->right != NULL) {
+		// 	return minimum(x->right);
+		// }
+	
+		// NodePtr y = x->parent;
+		// while (y != NULL && x == y->right) {
+		// 	x = y;
+		// 	y = y->parent;
+		// }
+		// return y;
+		// }
+	
+		// NodePtr predecessor(NodePtr x) {
+		// if (x->left != NULL) {
+		// 	return maximum(x->left);
+		// }
+	
+		// NodePtr y = x->parent;
+		// while (y != NULL && x == y->left) {
+		// 	x = y;
+		// 	y = y->parent;
+		// }
+	
+		// return y;
+		// }
 };
 
 }
