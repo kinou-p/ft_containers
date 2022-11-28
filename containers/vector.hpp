@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/25 15:54:52 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/28 21:36:36 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include "./iterators/enable_if.hpp"
 # include "./iterators/is_integral.hpp"
 # include "./iterators/reverse_iterator.hpp"
-//# include "./iterators/iterator_traits.hpp"
 
 # include <cstddef>
 # include <memory>
@@ -45,9 +44,7 @@ class vector
 	typedef ft::reverse_iterator<iterator>					reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 	typedef std::ptrdiff_t									difference_type;
-	typedef std::size_t										size_type;
-	//typedef random_access_iterator							iterator_category;
-	 
+	typedef std::size_t										size_type;	 
 	
 	//-----------------------------
 	//-----PRIVATE MEMBER TYPE-----
@@ -59,10 +56,6 @@ class vector
 		size_type				_capacity;
 
 		allocator_type			_alloc;
-		//ft::random_access_iterator<value_type>	_end;
-		//ft::random_access_iterator<value_type>	_start;
-		
-		//pointer			_end_capacity;
 
 	public:
 	
@@ -77,41 +70,64 @@ class vector
 		_alloc = alloc;
 	}
 	
-	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()): _alloc(alloc) //fill constructor
+	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _alloc(alloc) //fill constructor
 	{
 		_tab = _alloc.allocate(n);
 		_size = n;
 		_capacity = n;
-		while (n--)
-			_alloc.construct(_tab + n, val);
+		for (size_type i = 0; i < n ; i++)
+			_alloc.construct(_tab + i, val);
+	}
+
+	template <class InputIterator>
+	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL) : _alloc(alloc)  //range constructor
+	{
+		_tab = 0;
+		difference_type	diff = 0;
+		InputIterator tmp = first;
+		while(tmp != last)
+		{
+			diff++;
+			tmp++;
+		}
+		_size = diff;
+		_capacity = diff;
+		_tab = _alloc.allocate(_capacity);
+		for (size_type i = 0; i < _size; i++)
+			_alloc.construct(_tab + i, *first++);
 	}
 
 	vector (const vector& x)//copy constructor
 	{
+		_tab = 0;
+		_size = 0;
+		_capacity = 0;	
 		*this = x;
 	}
 
 	~vector()
 	{
-		//std::cout << "destct" << std::endl;
-		if (_capacity == 0)
+		if (_capacity)
 		{
 			_alloc.deallocate(_tab, _capacity);
 			_capacity = 0;
 		}
-		//std::cout << "destct end" << std::endl;
 	}
 	
 	vector& operator= (const vector& x)//assignation operator
 	{
-			//this->~vector();
-			_alloc = x._alloc;
-			_size = x._size;
-			_capacity = x._size;
-			_tab = _alloc.allocate(_size);
-			for (size_type i = 0; i < _size; i++)
-				_alloc.construct(_tab + i, x._tab[i]); 
-			return (*this);
+		if (_capacity)
+		{
+			_alloc.deallocate(_tab, _capacity);
+			_capacity = 0;
+		}
+		_alloc = x._alloc;
+		_size = x._size;
+		_capacity = x._size;
+		_tab = _alloc.allocate(_size);
+		for (size_type i = 0; i < _size; i++)
+			_alloc.construct(_tab + i, x._tab[i]); 
+		return (*this);
 	}
 	
 	//----------------------------------
@@ -176,12 +192,10 @@ class vector
 		
 		void resize (size_type n, value_type val = value_type()) //Resizes the container so that it contains n elements.
 		{
-			//std::cout << "resize------val = " << val << std::endl;
 			if (n < _size) 
 			{
 				while (n < _size)
 				{
-					//_end--;
 					_size--;
 					_alloc.destroy(_tab + _size);
 				}
@@ -193,11 +207,9 @@ class vector
 				{
 					_alloc.construct(_tab + _size, val);
 					_size++;
-					//_end++;
 				}
 				
 			}
-			//_size = n;
 		}
 		
 		size_type capacity() const
@@ -219,10 +231,11 @@ class vector
 			else if (n > _capacity)
 			{
 				value_type *tmp;
-				tmp = _alloc.allocate(n, 0);
-				for (int i = 0; _tab + i != _tab + _size; i++)
-					*(tmp + i) = *(_tab + i);
-				_alloc.deallocate(_tab, _capacity);
+				tmp = _alloc.allocate(n);
+				for (size_type i = 0; i < _size; i++)
+					_alloc.construct(tmp + i, *(_tab + i));
+				if (_capacity)
+					_alloc.deallocate(_tab, _capacity);
 				_tab = tmp;
 				_capacity = n;
 			}
@@ -243,7 +256,6 @@ class vector
 
 		reference at (size_type n)
 		{
-			//exception
 			if (n >= _size)
 				throw (std::out_of_range("ft::vector::at"));
 			return (*(_tab + n));
@@ -251,7 +263,6 @@ class vector
 		
 		const_reference at (size_type n) const
 		{
-			//exception
 			if (n >= _size)
 				throw (std::out_of_range("ft::vector::at"));
 			return (*(_tab + n));
@@ -292,7 +303,6 @@ class vector
 		//-------------------------
 
 		template <class InputIterator>
-		//void assign (InputIterator first, InputIterator last) //range
 		void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
 		{
 			this->clear();
@@ -319,7 +329,6 @@ class vector
 				this->reserve(1);
 			else if (_size == _capacity)
 				this->reserve(_size * 2);
-			//std::cout << "coucou1\n";
 			_alloc.construct(_tab + _size, val);
 			_size++;
 		}
@@ -335,68 +344,54 @@ class vector
 		
 		iterator insert (iterator position, const value_type& val) //single element
 		{
-			this->insert(position, 1, val);
-			return (position);
+			difference_type index = position - begin();
+
+			insert(position, 1, val);
+			return (iterator(begin() + index));
 		}
 		
 		void insert (iterator position, size_type n, const value_type& val) //fill
 		{
-			int j = 0;
-			int i; 
-			value_type *tmp;
+			difference_type const pos_diff = position - begin();
+			difference_type const old_end_diff = end() - begin();
+			iterator old_end;
+			iterator new_end;
 			
-			if (_size + n > this->max_size())
-				throw (std::length_error("vector::resize"));
-			tmp = _alloc.allocate(_size + n);
-			for (i = 0; i < position; i++)
-				tmp[i] = _tab[i];
-			while (n - j)
-			{
-				tmp[i + j] = val;
-				j++;
-			}
-			while (_size - i)
-				tmp[i + j] = _tab[i];
-			this->clear();
-			_tab = tmp;
-			_size += n;
-			_capacity = _size;
+			resize(this->_size + n);
+			new_end = end();
+			position = begin() + pos_diff;
+			old_end = begin() + old_end_diff;
+			while (old_end != position)
+				*--new_end = *--old_end;
+			while (n-- > 0)
+				*position++ = val;
 		}
 		
 		template <class InputIterator>
-		void insert (iterator position, InputIterator first, InputIterator last) //range
+		void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 		{
-			int j = 0;
-			int i;
-			value_type *tmp;
-			
-			if (_size + (last - first) > this->max_size())
-				throw (std::length_error("vector::resize"));
-			tmp = _alloc.allocate(_size + (last - first));
-			for (i = 0; i < position - _tab; i++)
-				tmp[i] = _tab[i];
-			while (first + j != last)
-			{
-				tmp[i + j] = *(j + first);
-				j++;
-			}
-			while (_size - i)
-				tmp[i + j] = _tab[i];
-			this->clear();
-			_tab = tmp;
-			_size += (last - first);
-			_capacity = _size;
+				size_type n = 0;
+				for (InputIterator tmp = first; tmp != last; tmp++) {
+					n++;
+				}
+				difference_type const pos_diff = position - begin();
+				difference_type const old_end_diff = end() - begin();
+				iterator old_end;
+				iterator new_end;
+
+				resize(_size + n);
+				new_end = end();
+				position = begin() + pos_diff;
+				old_end = begin() + old_end_diff;
+				while (old_end != position)
+					*--new_end = *--old_end;
+				while (first != last)
+					*position++ = *first++;
 		}
 
 		iterator erase (iterator position)
 		{
 			_alloc.destroy(&(*position));
-			// while (_tab + _size - 1 > _tab + (position - _tab))
-			// {
-			// 	*position = *(position + 1);
-			// 	position++;
-			// 	_alloc.destroy(&(*position));
-			// }
 			for (size_type i = 0; _tab + _size - 1 > _tab + (position - _tab + i); i++)
 			{
 				_alloc.construct(&(*(position + i)), *(position + i + 1));
@@ -409,7 +404,6 @@ class vector
 		iterator erase (iterator first, iterator last)
 		{
 			difference_type lenght = last - first;
-			//std::cout << "diff = " << lenght << std::endl;
 
 			int i;
 			for (i = 0; lenght - i - 1; i++)
@@ -419,11 +413,6 @@ class vector
 				_alloc.construct(&(*(first + i)), *(first + lenght + i));
 				_alloc.destroy(&(*(first + lenght + i )));
 			}
-			// for (; _size - lenght - i; i++)
-			// {
-			// 	_alloc.construct(&(*(first + i)), *(first + lenght + i));
-			// 	_alloc.destroy(&(*(first + _size - lenght + i )));
-			// }
 			_size -= lenght;
 			return (first);
 		}
@@ -464,13 +453,6 @@ class vector
 		//-------Comparaison-------
 		//-------------------------
 
-		// bool operator ==(const random_access_iterator &b) { return (this->_tab == b); }
-		// bool operator !=(const random_access_iterator &b) { return (this->_tab != b); }
-		// bool operator <(const random_access_iterator &b) { return (this->_tab < b); }
-		// bool operator >(const random_access_iterator &b) { return (this->_tab > b); }
-		// bool operator <=(const random_access_iterator &b) { return (this->_tab <= b); }
-		// bool operator >=(const random_access_iterator &b) { return (this->_tab >= b); }
-		
 		template <class Temp, class Alloc>
 		friend bool operator== (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
 		template <class Temp, class Alloc>
