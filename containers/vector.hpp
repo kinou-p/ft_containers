@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 14:05:18 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 15:46:33 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include "./iterators/reverse_iterator.hpp"
 
 # include <cstddef>
+# include <limits>
 # include <memory>
 # include <stdexcept>
 
@@ -323,15 +324,22 @@ class vector
 		//--------Modifiers--------
 		//-------------------------
 
-		template <class InputIterator>
-		void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
+		template <class _InputIterator>
+		void assign(typename ft::enable_if<!std::numeric_limits<_InputIterator>::is_integer, _InputIterator>::type first, _InputIterator last)
 		{
+			size_type	diff = 0;
+			
+			for (_InputIterator tmp = first; tmp != last; tmp++)
+				diff++;
+			size_type i = 0;
+			if (_capacity < diff)
+				i = 1;
 			this->clear();
-			while (first < last)
-			{
-				push_back(*first);
-				first++;
-			}
+			if (i)
+				resize(diff);
+			for (size_type tmp = 0; tmp != diff; tmp++)
+				_alloc.construct(_tab + tmp, *first++);
+			_size = diff;
 		}
 		
 		void assign (size_type n, const value_type& val) //fill
