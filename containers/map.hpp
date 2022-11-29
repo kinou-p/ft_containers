@@ -605,7 +605,7 @@ class map
 		v->parent = u->parent;
 	}
 	
-	void deleteNode(NodePtr node, int key)
+	void deleteNode(NodePtr node, key_type key)
 	{
 		NodePtr z = _end;
 		NodePtr x, y;

@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:32 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/28 21:36:36 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 02:18:37 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "./iterators/random_access_iterator.hpp"
 # include "./iterators/enable_if.hpp"
 # include "./iterators/is_integral.hpp"
+# include "./iterators/equal.hpp"
 # include "./iterators/reverse_iterator.hpp"
 
 # include <cstddef>
@@ -72,7 +73,10 @@ class vector
 	
 	explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _alloc(alloc) //fill constructor
 	{
-		_tab = _alloc.allocate(n);
+		if (n)
+			_tab = _alloc.allocate(n);
+		else
+			_tab = 0;
 		_size = n;
 		_capacity = n;
 		for (size_type i = 0; i < n ; i++)
@@ -92,7 +96,10 @@ class vector
 		}
 		_size = diff;
 		_capacity = diff;
-		_tab = _alloc.allocate(_capacity);
+		if (_capacity)
+			_tab = _alloc.allocate(_capacity);
+		else
+			_tab = 0;
 		for (size_type i = 0; i < _size; i++)
 			_alloc.construct(_tab + i, *first++);
 	}
@@ -109,6 +116,7 @@ class vector
 	{
 		if (_capacity)
 		{
+			this->destroy_tab();
 			_alloc.deallocate(_tab, _capacity);
 			_capacity = 0;
 		}
@@ -118,13 +126,17 @@ class vector
 	{
 		if (_capacity)
 		{
+			this->destroy_tab();
 			_alloc.deallocate(_tab, _capacity);
 			_capacity = 0;
 		}
 		_alloc = x._alloc;
 		_size = x._size;
 		_capacity = x._size;
-		_tab = _alloc.allocate(_size);
+		if (_capacity)
+			_tab = _alloc.allocate(_size);
+		else
+			_tab = 0;
 		for (size_type i = 0; i < _size; i++)
 			_alloc.construct(_tab + i, x._tab[i]); 
 		return (*this);
@@ -202,7 +214,22 @@ class vector
 			}
 			else if (n > _size)
 			{
-				this->reserve(n);
+				// while (n > _capacity)
+				// 	this->reserve(_capacity);
+				//if (n < _capacity * 2 && _size == _capacity)
+				
+				// else
+				if (n > _capacity)
+				{
+					if (n == _capacity + 1 || n > _capacity * 2)
+						this->reserve(n);
+					else
+						this->reserve(_capacity * 2);
+				}
+				// else if (n < _capacity * 2)
+				// 	this->reserve(_size * 2);
+				// else
+				//this->reserve(n);
 				while (n > _size)
 				{
 					_alloc.construct(_tab + _size, val);
@@ -235,10 +262,26 @@ class vector
 				for (size_type i = 0; i < _size; i++)
 					_alloc.construct(tmp + i, *(_tab + i));
 				if (_capacity)
+				{
+					this->destroy_tab();
 					_alloc.deallocate(_tab, _capacity);
+				}
 				_tab = tmp;
 				_capacity = n;
 			}
+				// if (n > this->max_size())
+				// 	throw (std::length_error("vector::reserve"));
+				// else if (n > _capacity)
+				// {
+				// 	value_type	*prev_ptr = _tab;
+				// 	std::size_t	prev_size = _size;
+				// 	std::size_t	prev_capacity = _capacity;
+				// 	_tab = _alloc.allocate(n);
+				// 	_capacity = n;
+				// 	for(std::size_t i = 0; i < prev_size; i++)
+				// 		_alloc.construct(_tab + i, *(prev_ptr + i));
+				// 	_alloc.deallocate(prev_ptr, prev_capacity);
+				// }
 		}
 		
 		//------------------------------
@@ -403,18 +446,41 @@ class vector
 
 		iterator erase (iterator first, iterator last)
 		{
-			difference_type lenght = last - first;
 
-			int i;
-			for (i = 0; lenght - i - 1; i++)
-				_alloc.destroy(&(*(first + i)));
-			for (i = 0; _size - i - 1; i++)
+			iterator temp(first);
+
+			while (temp != last)
 			{
-				_alloc.construct(&(*(first + i)), *(first + lenght + i));
-				_alloc.destroy(&(*(first + lenght + i )));
+				erase(first);
+				temp++;
 			}
-			_size -= lenght;
 			return (first);
+				// pointer p_first = &(*first);
+				// for (; &(*first) != &(*last); first++)
+				// 	_alloc.destroy(&(*first));
+				// for (int i = 0; i < this->end() - &(*last); i++)
+				// {
+				// 	_alloc.construct(p_first + i, *(&(*last) + i));
+				// 	_alloc.destroy(&(*last) + i);
+				// }
+				// //_end -= (&(*last) - p_first);
+				// return (iterator(p_first));
+			
+			
+			// difference_type lenght = last - first;
+
+			// int i;
+			// //if (first == this->begin() && last == this->end())
+			// //	this->clear();
+			// for (i = 0; lenght - i - 1; i++)
+			// 	_alloc.destroy(&(*(first + i)));
+			// for (i = 0; _size - i - 1; i++)
+			// {
+			// 	_alloc.construct(&(*(first + i)), *(&(*last) + i));
+			// 	_alloc.destroy(*(&(*last) + i));
+			// }
+			// _size -= lenght;
+			// return (first);
 		}
 		
 		void swap (vector& x)
@@ -465,6 +531,19 @@ class vector
 		friend bool operator>  (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
 		template <class Temp, class Alloc>
 		friend bool operator>= (const vector<Temp,Alloc>& lhs, const vector<Temp,Alloc>& rhs);
+
+		private:
+
+		void destroy_tab()
+		{
+			size_type i = 0;
+
+			while(i < _size)
+			{
+				_alloc.destroy(_tab + i);
+				i++;
+			}
+		}
 };
 
 	//---------------------------------------------
@@ -475,11 +554,12 @@ class vector
 	bool operator== (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
 		if (lhs._size != rhs._size)
-			return (lhs._size == rhs._size);
-		int i = 0;
-		while (lhs._size - i && lhs._tab[i] == rhs._tab[i])
-			i++;
-		return (lhs._tab[i] == rhs._tab[i]);
+			return (false);
+		// int i = 0;
+		// while (lhs._size - i - 1 && lhs._tab[i] == rhs._tab[i])
+		// 	i++;
+		// return (lhs._tab[i] == rhs._tab[i]);
+		return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 	
 	template <class T, class Alloc>  
