@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:35 by apommier          #+#    #+#             */
-/*   Updated: 2022/10/19 18:35:21 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 12:38:05 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 	#include <vector>
 	namespace ft = std;
 #else
-	#include <map.hpp>
-	#include <stack.hpp>
-	#include <vector.hpp>
+	#include "./containers/map.hpp"
+	#include "./containers/stack.hpp"
+	#include "./containers/vector.hpp"
 #endif
 
 #include <stdlib.h>

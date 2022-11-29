@@ -1,30 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_containers.hpp                                  :+:      :+:    :+:   */
+/*   map_tester.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/12 19:46:33 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 13:22:18 by apommier         ###   ########.fr       */
+/*   Created: 2022/11/29 12:55:17 by apommier          #+#    #+#             */
+/*   Updated: 2022/11/29 13:23:51 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#include "../ft_containers.hpp"
 
-# include <iostream>
+void map_tester()
+{
+	
+}
 
-# include "./containers/map.hpp"
-# include "./containers/stack.hpp"
-# include "./containers/vector.hpp"
-
-# include <map>
-# include <stack>
-# include <vector>
-
-void stack_tester();
-void real_stack_tester();
-void vector_tester();
-void real_vector_tester();
-void map_tester();
-void real_map_tester();
+void real_map_tester()
+{
+	
+}

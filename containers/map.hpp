@@ -33,12 +33,15 @@ template<
 
 class map
 {
+	protected :
+		struct	node;
+	
 	public :
 
 	//-----------------------------
 	//---------MEMBER TYPE---------
 	//-----------------------------
-	struct	node;
+	
 
 	typedef	Key																key_type;
 	typedef	node															Node;
@@ -74,9 +77,6 @@ class map
 		NodePtr				_end;
 		size_type			_size;
 
-	public :
-	
-	
 	struct node{
 		value_type	data;
 		NodePtr		parent;
@@ -91,6 +91,8 @@ class map
 		{}
 	};
 
+	public :
+	
 	//---------------------------------------
 	//---------COPLIEN FORM FUNCTION---------
 	//---------------------------------------
