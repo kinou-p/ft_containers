@@ -71,12 +71,6 @@ class bidirectionnal_iterator
 			else if (!lhs._node || !rhs._node)
 			 	return (false);
 			return (lhs._node == rhs._node);
-			// if (lhs._node && rhs._node)
-			// 	return (lhs._node->data == rhs._node->data);
-			// if (!lhs._node && !rhs._node)
-			// 	return (true);
-			// else
-			// 	return (false);
 		}
 		
 		friend bool operator!=(const bidirectionnal_iterator &rhs, const bidirectionnal_iterator &lhs)
@@ -86,12 +80,6 @@ class bidirectionnal_iterator
 			else if (!lhs._node || !rhs._node)
 			 	return (true);
 			return (lhs._node != rhs._node);
-			// if (lhs._node && rhs._node)
-			// 	return (lhs._node->data != rhs._node->data);
-			// if (!lhs._node && !rhs._node)
-			// 	return (true);
-			// else
-			// 	return (false);
 		}
 		
 		reference operator*() { return (_node->data); }
@@ -102,8 +90,6 @@ class bidirectionnal_iterator
 
 
 			bidirectionnal_iterator &operator++() {
-				//std::cout << "end == "<< _end << std::endl;
-				//std::cout << "node == "<< _node << std::endl; 
 				if (_node != _end)
 					_node = successor(_node);
 				return (*this);

@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/12 19:46:33 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 13:22:18 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 18:38:42 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <map>
 # include <stack>
 # include <vector>
+# include <utility>
 
 void stack_tester();
 void real_stack_tester();

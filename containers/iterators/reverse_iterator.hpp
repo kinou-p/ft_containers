@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/19 05:14:31 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/23 10:59:47 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 17:48:32 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,12 @@ namespace ft
 
 		reverse_iterator& operator++()
 		{
-			//std::cout << "ope0 ++\n";
 			--_Ite;
 			return (*this);
 		}
 		
 		reverse_iterator  operator++(int) 
 		{
-			//std::cout << "ope ++\n";
 			reverse_iterator<Iter> tmp = *this;
 			_Ite--;
 			return (tmp);
@@ -78,40 +76,16 @@ namespace ft
 		
 		reverse_iterator& operator--() 
 		{
-			//std::cout << "ope0 --\n";
 			++_Ite;
 			return (*this);
 		}
 		
 		reverse_iterator  operator--(int)
 		{
-			//std::cout << "ope --\n";
 			reverse_iterator<Iter> tmp = *this;
 			_Ite++;
 			return (tmp);
 		}
-
-		// reverse_iterator& operator++() {
-		// 	--_Ite;
-		// 	return (*this);
-		// }
-		
-		// reverse_iterator  operator++(int) {
-		// 	reverse_iterator<Iter> tmp = *this;
-		// 	_Ite--;
-		// 	return (tmp);
-		// }
-
-		// reverse_iterator& operator--() {
-		// 	++_Ite;
-		// 	return (*this);
-		// }
-		
-		// reverse_iterator  operator--(int) {
-		// 	reverse_iterator<Iter> tmp = *this;
-		// 	_Ite++;
-		// 	return (tmp);
-		// }
 
 		//---------------------------------------
 		//----------------ADRESS-----------------
@@ -175,7 +149,7 @@ namespace ft
 		//--------------GET----------------
 		//---------------------------------
 
-		iterator_type base() const { return /*iterator_type*/(_Ite); }
+		iterator_type base() const { return (_Ite); }
 	};
 
 		template<class Ite1, class Ite2>

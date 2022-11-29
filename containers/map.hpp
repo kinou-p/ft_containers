@@ -267,7 +267,6 @@ class map
 			return (ft::make_pair(find, false));
 		NodePtr pt = newNode(val.first, val.second);
 		insert(pt);
-		//iterator ret = find(val.first);
 		_size++;
 		return (ft::make_pair(iterator(_root, _end, pt), true));
 	}	
@@ -280,7 +279,6 @@ class map
 		_size++;
 		iterator ret = find(val.first);
 		return (ret);
-		//return (iterator(_root, _end, pt));
 	}
 	
 	template <class InputIterator>

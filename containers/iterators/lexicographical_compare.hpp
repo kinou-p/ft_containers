@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 14:58:42 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/28 15:46:54 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 17:28:55 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ namespace ft
 	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2, Compare comp) {
 		while (first1 != last1)
 		{
-			std::cout << "i serve\n" << std::endl;
 			if (comp(*first1, *first2))
 				return true;
 			if (comp(*first2, *first1))

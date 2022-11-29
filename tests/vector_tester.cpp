@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 12:55:23 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 15:56:25 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 17:53:35 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,34 @@ void vector_tester()
 	std::cout << *it-- << std::endl;
 	std::cout << *--it << std::endl;
 
+	std::cout << "----reverese iterator----\n";
+	ft::vector<int>::reverse_iterator it2 = ctnr4.rbegin();
+	ft::vector<int>::reverse_iterator ite2 = ctnr4.rend();
+
+	for (int i = 1; it2 != ite2; ++i)
+		*it2++ = i;
+	printSize(ctnr4);
+
+	it2 = ctnr4.rbegin();
+	ite2 = ctnr4.rend();
+
+	std::cout << "----rend---" << std::endl;
+	std::cout << *(--ite2) << std::endl;
+	std::cout << *(--ite2) << std::endl;
+	std::cout << *(--ite2) << std::endl;
+	std::cout << *(ite2--) << std::endl;
+	std::cout << *(ite2--) << std::endl;
+	std::cout << *(ite2--) << std::endl;
+	
+	std::cout << "----rbegin---" << std::endl;
+	std::cout << *(++it2) << std::endl;
+	std::cout << *(++it2) << std::endl;
+	std::cout << *(++it2) << std::endl;
+	std::cout << *(it2++) << std::endl;
+	std::cout << *(it2++) << std::endl;
+	std::cout << *(it2++) << std::endl;
+
+
 	std::cout << "----relationnal ope----\n";
 	cmp(ctnr, ctnr4);
 
@@ -239,6 +267,33 @@ void real_vector_tester()
 	std::cout << *(it--) << std::endl;
 	std::cout << *it-- << std::endl;
 	std::cout << *--it << std::endl;
+
+	std::cout << "----reverese iterator----\n";
+	std::vector<int>::reverse_iterator it2 = ctnr4.rbegin();
+	std::vector<int>::reverse_iterator ite2 = ctnr4.rend();
+
+	for (int i = 1; it2 != ite2; ++i)
+		*it2++ = i;
+	printSize_real(ctnr4);
+
+	it2 = ctnr4.rbegin();
+	ite2 = ctnr4.rend();
+
+	std::cout << "----rend---" << std::endl;
+	std::cout << *(--ite2) << std::endl;
+	std::cout << *(--ite2) << std::endl;
+	std::cout << *(--ite2) << std::endl;
+	std::cout << *(ite2--) << std::endl;
+	std::cout << *(ite2--) << std::endl;
+	std::cout << *(ite2--) << std::endl;
+	
+	std::cout << "----rbegin---" << std::endl;
+	std::cout << *(++it2) << std::endl;
+	std::cout << *(++it2) << std::endl;
+	std::cout << *(++it2) << std::endl;
+	std::cout << *(it2++) << std::endl;
+	std::cout << *(it2++) << std::endl;
+	std::cout << *(it2++) << std::endl;
 
 	std::cout << "----relationnal ope----\n";
 	cmp(ctnr, ctnr4);
