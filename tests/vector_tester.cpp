@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 12:55:23 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 15:30:18 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 15:56:25 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,10 @@ void vector_tester()
 
 	std::cout << "----relationnal ope----\n";
 	cmp(ctnr, ctnr4);
+
+	std::cout << "----element access----\n";
+	std::cout << ctnr4[10] << std::endl;
+	std::cout << ctnr4.at(10) << std::endl;
 }
 
 void real_vector_tester()
@@ -239,5 +243,7 @@ void real_vector_tester()
 	std::cout << "----relationnal ope----\n";
 	cmp(ctnr, ctnr4);
 
-	 
+	std::cout << "----element access----\n";
+	std::cout << ctnr4[10] << std::endl;
+	std::cout << ctnr4.at(10) << std::endl;
 }
