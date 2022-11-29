@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 12:55:23 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 15:06:00 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 15:30:18 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,10 @@ void real_vector_tester()
 	ctnr.assign(10, 1);
 	printSize_real(ctnr);
 	
+	std::cout << "----copy constructor----" << std::endl;
+	std::vector<int> ctnr_copy(ctnr);
+	printSize_real(ctnr_copy);
+
 	std::cout << "----range constructor----" << std::endl;
 	std::vector<int> ctnr2(ctnr.begin(), ctnr.end());
 	printSize_real(ctnr2);
