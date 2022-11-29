@@ -126,13 +126,8 @@ class map
 	
 	~map()
 	{
-		// if (_size && _root && _root != _end)
-		// 	this->clear();
-		//if (_size)
-		//{
-			this->destructTree(_root);
-			this->destructNode(_end);
-		//}
+		this->destructTree(_root);
+		this->destructNode(_end);
 	}
 
 	map& operator=(const map& x)
@@ -141,11 +136,7 @@ class map
 		_comp = (x._comp);
 		_alloc = (x._alloc);
 		_node_alloc = (x._node_alloc);
-		//destructNode(_end);
-		//_end = x._end;
 		_size = 0;
-		//_end = _node_alloc.allocate(1);
-		//_node_alloc.construct(_end, node());
 		_root = _end;
 		insert(x.begin(), x.end());
 		return (*this);
@@ -333,17 +324,6 @@ class map
 	
 	void swap (map& x)
 	{
-		//map tmp;
-
-		// key_compare			_comp;
-		// allocator_type		_alloc;
-		// node_allocator_type	_node_alloc;
-		
-		// NodePtr				_root;
-		// NodePtr				_end;
-		// size_type			_size;
-
-		// //destructNode(tmp._end);
 		key_compare				tmp_comp = _comp;
 		allocator_type			tmp_alloc = _alloc;
 		node_allocator_type		tmp_node_alloc = _node_alloc;
@@ -358,22 +338,17 @@ class map
 		_size = x._size;
 		_end = x._end;
 
-		//x = tmp;
 		x._comp = tmp_comp;
 		x._alloc = tmp_alloc;
 		x._node_alloc = tmp_node_alloc;
 		x._root = tmp_root;
 		x._size = tmp_size;
 		x._end = tmp_end;
-		
-		//tmp._end = 0;
-		//tmp._size = 0;
 	}
 
 	void clear()
 	{
 		this->destructTree(_root);
-		// this->destructNode(_end);
 		_size = 0;
 		_root = _end;
 	}

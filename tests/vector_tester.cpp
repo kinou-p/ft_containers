@@ -6,7 +6,7 @@
 /*   By: apommier <apommier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 12:55:23 by apommier          #+#    #+#             */
-/*   Updated: 2022/11/29 14:45:23 by apommier         ###   ########.fr       */
+/*   Updated: 2022/11/29 15:06:00 by apommier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,10 @@ void vector_tester()
 	std::cout << "----assign val----" << std::endl;
 	ctnr.assign(10, 1);
 	printSize(ctnr);
+
+	std::cout << "----copy constructor----" << std::endl;
+	ft::vector<int> ctnr_copy(ctnr);
+	printSize(ctnr_copy);
 	
 	std::cout << "----range constructor----" << std::endl;
 	ft::vector<int> ctnr2(ctnr.begin(), ctnr.end());
@@ -156,7 +160,7 @@ void real_vector_tester()
 	std::vector<int> ctnr3;
 	ctnr3.assign(ctnr.begin(), ctnr.end());
 	printSize_real(ctnr3);
-////////////
+
 	std::cout << "----insert at position + assign constrcutor----" << std::endl;
 	std::vector<int> ctnr4(5, 5);
 	printSize_real(ctnr4);
@@ -230,4 +234,6 @@ void real_vector_tester()
 
 	std::cout << "----relationnal ope----\n";
 	cmp(ctnr, ctnr4);
+
+	 
 }
